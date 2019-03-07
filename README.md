@@ -1,6 +1,6 @@
 # boxioffice
 
-> A combination online Box Office and Actor Database django webapp
+> A combination online box office and actor database django webapp
 
 ## Authors
 
