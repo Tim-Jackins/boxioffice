@@ -1,0 +1,37 @@
+{% extends "common/base.html" %}
+
+{% block title %}
+    <title>BoxOffice | Theatres</title>
+{% endblock %}
+
+{% block content %}
+<!--
+	{% for category in shows %}
+	<div class="jumbotron">
+        <div class="text-center">
+        	<h2>{{ category.0.language }} MOVIES</h2>
+        </div>
+        <div class="row">-->
+		{% for show in shows %}
+	        <div class="col-sm-4">
+	        	<div class="thumbnail">
+	            	<img src="{{ MEDIA_URL }}/media/{{ show.image }}" alt="{{ show.name }}">
+	            	<div class="caption">
+	              		<h3><a href="{% url 'show_details' show.id %}">{{ show.name }}</a></h3>
+	              		<p>{{ show.cast }}</p>
+	              		<p>{{ show.language }} | {{ show.certificate }}</p>
+	              		<p><a class="btn btn-default" onclick="watchTrailer('{{ show.name }}','{{ show.trailer }}')" role="button">Watch Trailer</a> <a class="btn btn-primary" href="{% url 'show_details' show.id %}" role="button">Book Now</a></p>
+	           		 </div>
+	          	</div>
+	        </div>
+	    {% if forloop.counter|divisibleby:3 or forloop.counter == category|length %}
+	    </div>
+	    {% endif %}
+	    {% if forloop.counter != category|length %}
+	    <div class="row">
+	    {% endif %}
+	    <!--{% endfor %}-->
+	</div>
+	{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,7 @@
+*.pyc
+/static/media/headshots/*
+/static/media/media/*
+.env
+multi.py
+__pycache__
+.env

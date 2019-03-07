@@ -1,0 +1,25 @@
+{% extends "common/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    <title>Waves Theatre | Payment</title>
+{% endblock %}
+
+{% block content %}
+
+	<h1>Booking Details</h1>
+	<div class="booking">
+		<form method="POST" action="{% url 'payment_confirmation' %}">
+			{% csrf_token %}
+			<input type="hidden" id="showing_id" name="showing_id" value="{{ showing.id }}">
+			Show:<input id="showing" name="showing" value="{{ showing.show }}" readonly><br>
+			Theatre:<input id="theater" name="theater" value="{{ showing.theater }}"  readonly><br>
+			Showtime:<input id="showtime" name="showtime" value="{{ showing.datetime }}"  readonly><br>
+			Number of Seats:<input id="number_of_tickets" name="number_of_tickets" value="{{ number_of_tickets }}"  readonly><br>
+			Payable Amount:<input id="amount" name="amount" value="{{ ticket_price }}"  readonly><br>
+			{{ form|crispy }}
+			<button type="submit">Pay</button>
+		</form>
+	</div>
+
+{% endblock %}
