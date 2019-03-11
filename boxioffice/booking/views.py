@@ -5,9 +5,16 @@ from .models import *
 from django.core.mail import send_mail
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.urls import reverse
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
+from paypal.standard.forms import PayPalPaymentsForm
+
+from box_office.settings import EMAIL_HOST
 from .forms import BookingForm, SelectedTicketForm
 import datetime
+import uuid
 
 @login_required
 def reserve_seat(request, pk):
@@ -41,50 +48,76 @@ def payment_gateway(request):
 				openTickets.append(ticket)
 
 		if len(openTickets) < number_of_tickets:
-			return redirect('booking/seatnotfound.html')
+			return redirect(reverse('seatnotfound'))
 		
 		form = BookingForm()
-		
-		ticket_price = showing.cost
 
-		context = {'number_of_tickets' : number_of_tickets, 'showing' : showing, 'form' : form, 'ticket_price' : ticket_price}
+		#total_price = '${:,.2f}'.format(ticket_price * number_of_tickets)
+		total_price = showing.cost * number_of_tickets
+
+		
+		# What you want the button to do.
+		paypal_dict = {
+			"business": EMAIL_HOST,
+			"amount": total_price,
+			"item_name": f'{number_of_tickets} tickets for {showing}',
+			"invoice": uuid.uuid4,
+			'currency_code' : 'USD',
+			"notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
+			"return": request.build_absolute_uri(reverse('payment_gateway')),
+			"cancel_return": request.build_absolute_uri(reverse('payment_cancelled')),
+		}
+
+		form = PayPalPaymentsForm(initial=paypal_dict)
+		
+		context = {
+			'number_of_tickets' : number_of_tickets,
+			'showing' : showing,
+			'form' : form,
+			'total_price' : total_price
+		}
+		
 		return render(request, 'booking/payment_gateway.html', context)
 	else:
 		return redirect('/booking/')
 
 
-@login_required
+@csrf_exempt
 def payment_confirmation(request):
-	if request.POST:
-		showing_id = request.POST.get('showing_id')
-		showing = Showing.objects.get(pk=showing_id)
-		number_of_tickets = eval(request.POST.get('number_of_tickets'))
+	showing_id = request.POST.get('showing_id')
+	showing = Showing.objects.get(pk=showing_id)
+	number_of_tickets = eval(request.POST.get('number_of_tickets'))
 
-		booking = Booking(
-			payment_type=request.POST.get('payment_type'),
-			paid_amount=eval(request.POST.get('amount').replace('$', '')),
-			paid_by=request.user,
+	booking = Booking(
+		paid_amount=eval(request.POST.get('amount').replace('$', '')),
+		paid_by=request.user,
+	)
+
+	booking.save()
+
+	allTickets = Ticket.objects.filter(showing=showing)
+	
+	openTickets = []
+
+	for ticket in allTickets:
+		try:
+			BookedTicket.objects.get(ticket=ticket)
+		except:
+			openTickets.append(ticket)
+
+	for ticketIndex in range(number_of_tickets):
+		tempBookedTicket = BookedTicket(
+			ticket=openTickets[ticketIndex],
+			booking=booking,
 		)
+		tempBookedTicket.save()
+	
+	return render(request, 'booking/payment_confirmation.html')
 
-		booking.save()
+@csrf_exempt
+def payment_cancelled(request):
+	return render(request, 'booking/payment_cancelled.html')
 
-		allTickets = Ticket.objects.filter(showing=showing)
-
-		ticketBookings = []
-
-		for ticketIndex in range(number_of_tickets):
-			ticketBookings.append(
-				BookedTicket(
-					ticket=allTickets[ticketIndex],
-					booking=booking,
-				)
-			)
-
-		BookedTicket.objects.bulk_create(ticketBookings)
-
-		return render(request, 'booking/payment_confirmation.html')
-	else:
-		return redirect('/')
 
 def show_list(request):
 	shows = Show.objects.all().order_by('name')
@@ -180,6 +213,7 @@ def show_index(request):
 		}]
 
 	return render(request, 'common/booking.html', {'all_details_list' : zip(show_list, date_details)})
+
 
 def handler404(request, *args, **argv):
     response = render_to_response('404.html', context=RequestContext(request))

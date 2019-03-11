@@ -30,6 +30,11 @@ LOGOUT_REDIRECT_URL = 'home'
 
 SITE_ID=1
 
+#Paypal vals
+PAYPAL_TEST = True
+PAYPAL_RECEIVER_EMAIL = EMAIL_HOST
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -46,6 +51,7 @@ INSTALLED_APPS = [
     'contact',
     'dashboard',
     'players',
+    'paypal.standard.ipn',
     'social_django',
 ]
 

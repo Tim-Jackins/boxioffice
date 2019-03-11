@@ -28,6 +28,7 @@ urlpatterns = [
     #Hard Coded templates i.e. without views.
     url(r'^booking/payment/booking/seatnotfound.html$', TemplateView.as_view(template_name="booking/seatnotfound.html"), name='seatnotfound'),
     url(r'^booking/payment_confirmation/booking/seatconflict.html$', TemplateView.as_view(template_name="booking/seatconflict.html"), name='seatconflict'),
+    url(r'^booking/payment_confirmation/booking/payment_cancelled.html$', TemplateView.as_view(template_name="booking/payment_cancelled.html"), name='payment_cancelled'),
     url(r'^favicon.ico$',
         RedirectView.as_view( # the redirecting function
             url=staticfiles_storage.url('img/favicon.ico'),
@@ -42,6 +43,11 @@ urlpatterns += [
     url(r'^login/$', auth_views.LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
     url(r'^oauth/', include('social_django.urls', namespace='social')),
+]
+
+# For PayPal IPN
+urlpatterns += [
+    url(r'^paypal/', include('paypal.standard.ipn.urls')),
 ]
 
 if settings.DEBUG:

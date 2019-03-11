@@ -27,7 +27,7 @@ class Show(models.Model):
 
 class Theater(models.Model):
     name                = models.CharField(max_length=50)
-    max_occupancy       = models.IntegerField(null=True, blank=True)
+    max_occupancy       = models.IntegerField(default=20)
     location_link       = models.CharField(help_text='Copy the goo.gl share link from google maps', max_length=32, null=True, blank=True)
     frame_link          = models.CharField(help_text='Click "Copy Link" then Embed a map the src lin in this field', max_length=400, null=True, blank=True)
 
@@ -60,9 +60,10 @@ class Booking(models.Model):
         ('PAYPAL', 'PayPal'),
     )
 
+    invoice             = models.UUIDField(null=True,blank=True)
     datetime            = models.DateTimeField(default=now, editable=False)
-    payment_type        = models.CharField(max_length=11, choices=payment_choice,default='PayPal')
-    paid_amount         = models.DecimalField(max_digits=8, decimal_places=2,null=True,blank=True)
+    payment_type        = models.CharField(max_length=11, choices=payment_choice, default='PayPal')
+    paid_amount         = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', null=True, blank=True)
     paid_by             = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.DO_NOTHING,null=True,blank=True)
 
     def __str__(self):
@@ -82,4 +83,4 @@ class BookedTicket(models.Model):
     booking             = models.ForeignKey(Booking, on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.seat) + ' | ' + str(self.booking)
+        return str(self.ticket) + ' | ' + str(self.booking)
