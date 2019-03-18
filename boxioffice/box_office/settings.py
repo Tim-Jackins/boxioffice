@@ -1,6 +1,8 @@
 import os
 from decouple import config
 
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -44,15 +46,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'django.contrib.messages',
+    'django.forms',
     'crispy_forms',
     'django.contrib.sites',
     'djmoney',
+    'blog',
     'booking',
     'contact',
-    'dashboard',
     'players',
     'paypal.standard.ipn',
     'social_django',
+    'markdownx',
 ]
 
 MIDDLEWARE = [
