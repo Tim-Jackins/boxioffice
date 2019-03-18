@@ -42,8 +42,16 @@ class Showing(models.Model):
     theater             = models.ForeignKey('Theater', on_delete=models.CASCADE,null=True,blank=True)
     cost                = MoneyField(max_digits=14, decimal_places=2, default_currency='USD')
 
-    def save(self, **kwargs):
-        super(Showing, self).save(**kwargs)
+
+    @classmethod
+    def create(cls, datetime, show, theater, cost):
+        showing = cls(
+            datetime=datetime,
+            show=show,
+            theater=theater,
+            cost=cost,
+        )
+
         showingTickets = []
         print(f'Generating tickets for showing {Showing}')
         showings = Showing.objects.all()
@@ -51,6 +59,8 @@ class Showing(models.Model):
         for i in range(self.theater.max_occupancy):
             showingTickets.append(Ticket(showing=newShowing))
         Ticket.objects.bulk_create(showingTickets)
+        
+        return showing
 
     def __str__(self):
         return f'{self.show} at {self.datetime}'
@@ -65,7 +75,7 @@ class Booking(models.Model):
     datetime            = models.DateTimeField(default=now, editable=False)
     payment_type        = models.CharField(max_length=11, choices=payment_choice, default='PayPal')
     paid_amount         = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', null=True, blank=True)
-    paid_by             = models.ForeignKey(get_user_model,on_delete=models.DO_NOTHING,null=True,blank=True)
+    paid_by             = models.ForeignKey(get_user_model(),on_delete=models.DO_NOTHING,null=True,blank=True)
 
     def __str__(self):
         return f'{self.datetime} | {self.paid_by}'
