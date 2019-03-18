@@ -8,6 +8,7 @@ import datetime
 import uuid
 from django.db import models
 from djmoney.models.fields import MoneyField
+from django.contrib.auth import get_user_model
 
 
 class Show(models.Model):
@@ -64,7 +65,7 @@ class Booking(models.Model):
     datetime            = models.DateTimeField(default=now, editable=False)
     payment_type        = models.CharField(max_length=11, choices=payment_choice, default='PayPal')
     paid_amount         = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', null=True, blank=True)
-    paid_by             = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.DO_NOTHING,null=True,blank=True)
+    paid_by             = models.ForeignKey(get_user_model,on_delete=models.DO_NOTHING,null=True,blank=True)
 
     def __str__(self):
         return f'{self.datetime} | {self.paid_by}'

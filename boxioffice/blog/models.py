@@ -1,9 +1,10 @@
 from django.db import models
 from django.utils import timezone
 from markdownx.models import MarkdownxField
+from django.contrib.auth import get_user_model
 
 class Post(models.Model):
-    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     text = MarkdownxField()
     created_date = models.DateTimeField(default=timezone.now)

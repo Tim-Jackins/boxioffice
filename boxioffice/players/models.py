@@ -7,6 +7,7 @@ from booking.models import Show
 from hashlib import md5
 from time import time
 import uuid
+from django.contrib.auth import get_user_model
 
 class Actor(models.Model):
     firstname           = models.CharField(max_length=15)
@@ -15,7 +16,8 @@ class Actor(models.Model):
     dob                 = models.DateField()
     bio                 = models.TextField(max_length=280)
     headshot            = models.ImageField(help_text='Make sure your headshot is 8in x 10in.', upload_to='headshots')
-    
+    user_logged_in      = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+
     def __str__(self):
         return f'{self.firstname} {self.lastname} ({self.dob})'
 

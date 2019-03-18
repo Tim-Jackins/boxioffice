@@ -57,7 +57,10 @@ INSTALLED_APPS = [
     'paypal.standard.ipn',
     'social_django',
     'markdownx',
+    'users.apps.UsersConfig',
 ]
+
+AUTH_USER_MODEL = 'users.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

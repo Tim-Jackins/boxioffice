@@ -33,6 +33,9 @@ urlpatterns = [
     url(r'^blog/', include('blog.urls')),
     url(r'^markdownx/', include('markdownx.urls')),
     
+    path('users/', include('users.urls')),
+    path('users/', include('django.contrib.auth.urls')),
+
     url(r'^favicon.ico$',
         RedirectView.as_view( # the redirecting function
             url=staticfiles_storage.url('img/favicon.ico'),
