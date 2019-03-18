@@ -1,96 +1,104 @@
-* {
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+/*
+ * This css file includes styles added in the jekyll port of this theme.
+ * To find the original style.css that ships with Airspace, read airspace.css
+ *
+ */
+
+.italic {
+  font-style: italic;
 }
 
-body {
-  padding: 0;
-  margin: 0;
+.bold {
+  font-weight: bold;
 }
 
-#notfound {
-  position: relative;
-  height: 100vh;
-}
-
-#notfound .notfound {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-      -ms-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
-}
-
-.notfound {
-  max-width: 410px;
-  width: 100%;
+.center-text {
   text-align: center;
 }
 
-.notfound .notfound-404 {
-  height: 280px;
-  position: relative;
-  z-index: -1;
+.post-area {
+  padding: 40px;
+  width: 100%;
+  min-height: 150px;
+  background-color: white;
+  border-bottom: 1px dotted #ddd;
 }
 
-.notfound .notfound-404 h1 {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 230px;
-  margin: 0px;
-  font-weight: 900;
-  position: absolute;
-  left: 50%;
-  -webkit-transform: translateX(-50%);
-      -ms-transform: translateX(-50%);
-          transform: translateX(-50%);
-  background: url('../img/bg.jpg') no-repeat;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-size: cover;
-  background-position: center;
+.post-area a:link, .post-area a:visited {
+  font-size: 30px;
+  color: #333;
 }
 
-
-.notfound h2 {
-  font-family: 'Montserrat', sans-serif;
-  color: #000;
-  font-size: 24px;
-  font-weight: 700;
-  text-transform: uppercase;
-  margin-top: 0;
+.post-area a:hover {
+  color: #0D0017;
 }
 
-.notfound p {
-  font-family: 'Montserrat', sans-serif;
-  color: #000;
-  font-size: 14px;
-  font-weight: 400;
-  margin-bottom: 20px;
-  margin-top: 0px;
+ul li:hover div {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
 }
 
-.notfound a {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 14px;
-  text-decoration: none;
-  text-transform: uppercase;
-  background: #0046d5;
+.fade {
+  -moz-transition: all 0.4s ease-in-out;
+  -o-transition: all 0.4s ease-in-out;
+  -webkit-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
+}
+
+p.choice a {
+  padding: 5px 15px;
+  height: 18px;
+  line-height: 18px;
+  font-weight: bold;
+  min-width: 45px;
   display: inline-block;
-  padding: 15px 30px;
-  border-radius: 40px;
+  text-decoration: none;
   color: #fff;
-  font-weight: 700;
-  -webkit-box-shadow: 0px 4px 15px -5px #0046d5;
-          box-shadow: 0px 4px 15px -5px #0046d5;
+  text-align: center;
+  margin-left: 10px;
+  font-size: 12px;
+  background: #0A75B6;
 }
 
+p.choice a + a {
+  margin-left: -4px;
+}
 
-@media only screen and (max-width: 767px) {
-    .notfound .notfound-404 {
-      height: 142px;
-    }
-    .notfound .notfound-404 h1 {
-      font-size: 112px;
-    }
+p.choice a.inactive {
+  color: #777;
+  transition: all 0.2s linear;
+  background: #eee;
+  background: rgba(0,0,0,0.06);
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.3);
+}
+
+p.choice a.inactive:hover {
+  background: rgba(0,0,0,0.12);
+}
+
+.pointer-events-off li div {
+  pointer-events: auto;
+}
+
+ul.method-display li div {
+  visibility: visible;
+  display: none;
+}
+
+ul.method-display li:hover div {
+  opacity: 1;
+  display: block;
+}
+
+.preview-holder{
+	border:2px solid #999;
+	padding:10px;
+}
+
+.titlebox{
+	float:left;
+	padding:0 5px;
+	margin:-20px 0 0 30px;
+	background:#fff;
 }
