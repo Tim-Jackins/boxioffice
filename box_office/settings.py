@@ -169,7 +169,6 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static-only'),
 )
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 #For offline testing we used static folder outside the BASE_DIR
 '''
