@@ -6,3 +6,4 @@ multi.py
 __pycache__
 .env
 db.sqlite3
+staticfiles/*
