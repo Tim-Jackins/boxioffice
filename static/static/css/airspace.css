@@ -46,7 +46,7 @@
  a:active,
  a:focus,
  a:active {
-   text-decoration: none !important;
+   text-decoration: none;
  }
  .section-title {
    margin-bottom: 70px;
@@ -358,7 +358,7 @@
    Slider-work Start
  --*/
  #global-header {
-   background: url("/static/img/slider-bg.jpg") no-repeat;
+   background: url("/static/img/actors_singing.png") no-repeat;
    background-size: cover;
    padding-top: 150px;
    padding-bottom: 107px;

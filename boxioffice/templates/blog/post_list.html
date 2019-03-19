@@ -6,20 +6,39 @@
 
 {% block content %}
 
-{% if posts %}
-
+{% load blog_extras %}
+<!--
 {% for post in posts %}
 <div>
     <p>published: {{ post.published_date }}</p>
-    <h1><a href="">{{ post.title }}</a></h1>
-    <p>{{ post.text|linebreaksbr }}</p>
+    <h1>{{ post.title }}</h1>
+    <p>{{ post.content|show_markdown|safe }}</p>
 </div>
 {% endfor %}
+-->
+<section id="global-header">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="block">
+            <h1>Get the latest on what we're doing</h1>
+            <p>Catch up with us, anytime and anywhere</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% for post in posts %}
+  <div class="post-area">
+    <h2>{{ post.title }}</h2>
+    <p class="post-date">{{ post.published_date }}</p>
+    <p>
+      {{ post.content|show_markdown|safe }}
+    </p>
+  </div>
+  <hr>
+  {% endfor %}
+  
 
-{% else %}
-
-<h2>Oh no, there are no blog posts</h2>
-
-{% endif %}
 
 {% endblock %}
