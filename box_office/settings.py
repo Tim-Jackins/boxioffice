@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.forms',
     'crispy_forms',
-    'django.contrib.sites',
     'djmoney',
     'blog',
     'booking',
