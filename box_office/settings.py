@@ -41,6 +41,9 @@ PAYPAL_RECEIVER_EMAIL = EMAIL_HOST
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.sites',
+    'allauth',                                                                 
+    'allauth.account',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
