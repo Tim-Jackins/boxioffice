@@ -1,6 +1,7 @@
 import django_heroku
 import os
 from decouple import config
+import dj_database_url
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
@@ -18,7 +19,13 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
+ISLOCAL = config('ISLOCAL', cast=bool)
+
+ALLOWED_HOSTS = [
+    '0.0.0.0',
+    'localhost',
+    '.herokuapp.com',
+]
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'mraduldubeymd19@gmail.com'
@@ -118,12 +125,17 @@ WSGI_APPLICATION = 'box_office.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 
+#if ISLOCAL:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+#else:
+#   db_from_env = dj_database_url.config(conn_max_age=600)
+    #DATABASES = {'default': None}
+#    DATABASES['default'].update(db_from_env)
 
 
 # Password validation
