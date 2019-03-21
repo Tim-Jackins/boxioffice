@@ -3,6 +3,16 @@ import os
 from decouple import config
 import dj_database_url
 
+import herokuify
+
+from herokuify.common import *          # Common settings, SSL proxy header
+from herokuify.aws import *             # AWS access keys
+#from herokuify.mail.mailgun import *    # Mailgun email add-on settings
+#from herokuify.mail.sendgrid import *   # ... or Sendgrid
+
+
+CACHES = herokuify.get_cache_config()   # Memcache config for Memcache/MemCachier
+
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -150,18 +160,15 @@ WSGI_APPLICATION = 'box_office.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 
-#if ISLOCAL:
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if ISLOCAL:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
-#else:
-#   db_from_env = dj_database_url.config(conn_max_age=600)
-    #DATABASES = {'default': None}
-#    DATABASES['default'].update(db_from_env)
-
+else:
+    DATABASES = herokuify.get_db_config()   # Database config
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
