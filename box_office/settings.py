@@ -27,6 +27,31 @@ ALLOWED_HOSTS = [
     '.herokuapp.com',
 ]
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.10/howto/static-files/
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATIC_URL = '/static/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
+MEDIA_URL = '/media/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL')
+
+DEFAULT_FILE_STORAGE = "herokuify.storage.S3MediaStorage"
+MEDIA_URL = f'https://{AWS_S3_ENDPOINT_URL}/media/'
+
+STATICFILES_STORAGE = "herokuify.storage.CachedS3StaticStorage"
+STATIC_URL = f'https://{AWS_S3_ENDPOINT_URL}/static/'
+
+COMPRESS_STORAGE = "herokuify.storage.CachedS3StaticStorage"
+COMPRESS_OFFLINE = True
+
+
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'mraduldubeymd19@gmail.com'
 EMAIL_HOST_PASSWORD = 'xxxxxxxxxxxxxxxxx'
@@ -169,22 +194,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.10/howto/static-files/
-
-isLocal = config('ISLOCAL', cast=bool)
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-STATIC_URL = '/static/'
-MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
-MEDIA_URL = '/media/'
-
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
