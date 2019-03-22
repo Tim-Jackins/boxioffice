@@ -158,15 +158,7 @@ WSGI_APPLICATION = 'box_office.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-if ISLOCAL:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
-else:
-    DATABASES = herokuify.get_db_config()
+DATABASES = herokuify.get_db_config()
 
 
 # Password validation
