@@ -25,6 +25,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.spl
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 # https://www.digitalocean.com/community/tutorials/how-to-set-up-object-storage-with-django
 
+AWS_DEFAULT_ACL = None
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
@@ -39,6 +40,9 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_URL = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, 'media')
 
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
