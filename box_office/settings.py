@@ -2,6 +2,7 @@ import django_heroku
 import os
 from decouple import config
 import dj_database_url
+import herokuify
 
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
@@ -157,17 +158,15 @@ WSGI_APPLICATION = 'box_office.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if ISLOCAL:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
-
-if not ISLOCAL:
-    db_from_env = dj_database_url.config(conn_max_age=600)
-    DATABASES['default'].update(db_from_env)
+else:
+    DATABASES = herokuify.get_db_config()
 
 
 # Password validation
