@@ -2,15 +2,6 @@ import django_heroku
 import os
 from decouple import config
 
-import herokuify
-
-from herokuify.common import *          # Common settings, SSL proxy header
-from herokuify.aws import *             # AWS access keys
-#from herokuify.mail.mailgun import *    # Mailgun email add-on settings
-#from herokuify.mail.sendgrid import *   # ... or Sendgrid
-
-
-CACHES = herokuify.get_cache_config()   # Memcache config for Memcache/MemCachier
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
@@ -32,28 +23,35 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.spl
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-object-storage-with-django
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = 'https://' + config('AWS_S3_ENDPOINT_URL')
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_LOCATION = 'static'
 
-STATIC_URL = '/static/'
-MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
-MEDIA_URL = '/media/'
-
-STATICFILES_DIRS = (
+STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-)
+]
 
-AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL')
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
 
-DEFAULT_FILE_STORAGE = "herokuify.storage.S3MediaStorage"
-MEDIA_URL = f'https://{AWS_S3_ENDPOINT_URL}/media/'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-STATICFILES_STORAGE = "herokuify.storage.CachedS3StaticStorage"
-STATIC_URL = f'https://{AWS_S3_ENDPOINT_URL}/static/'
-
-COMPRESS_STORAGE = "herokuify.storage.CachedS3StaticStorage"
-COMPRESS_OFFLINE = True
-
+#For offline testing we used static folder outside the BASE_DIR
+'''
+if DEBUG:
+    MEDIA_URL = '/media/'
+    STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR),"static","static-only")
+    MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR),"static","media")
+    STATICFILES_DIRS = (
+        os.path.join(os.path.dirname(BASE_DIR),"static","static"),
+    )
+'''
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'mraduldubeymd19@gmail.com'
@@ -77,6 +75,7 @@ PAYPAL_RECEIVER_EMAIL = EMAIL_HOST
 
 INSTALLED_APPS = [
     'django.contrib.sites',
+    'storages',
     'allauth',                                                                 
     'allauth.account',
     'django.contrib.admin',
@@ -193,18 +192,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-#For offline testing we used static folder outside the BASE_DIR
-'''
-if DEBUG:
-    MEDIA_URL = '/media/'
-    STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR),"static","static-only")
-    MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR),"static","media")
-    STATICFILES_DIRS = (
-        os.path.join(os.path.dirname(BASE_DIR),"static","static"),
-    )
-'''
 #template packs of crispy-forms
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
@@ -213,4 +201,4 @@ SOCIAL_AUTH_GITHUB_KEY = config('SOCIAL_AUTH_GITHUB_KEY')
 SOCIAL_AUTH_GITHUB_SECRET = config('SOCIAL_AUTH_GITHUB_SECRET')
 
 # Activate Django-Heroku.
-django_heroku.settings(locals())
+#django_heroku.settings(locals())
