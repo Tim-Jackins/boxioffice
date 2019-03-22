@@ -41,8 +41,8 @@ STATICFILES_DIRS = [
 
 STATIC_URL = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, 'media')
+#MEDIA_URL = '/media/'
+#MEDIA_ROOT = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, 'media')
 
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
@@ -113,7 +113,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'box_office.urls'
