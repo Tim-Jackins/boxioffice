@@ -2,8 +2,9 @@ import django_heroku
 import os
 from decouple import config
 import dj_database_url
-import herokuify
 
+
+# Misc
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
@@ -25,62 +26,36 @@ ISLOCAL = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
+SITE_ID=1
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 # https://www.digitalocean.com/community/tutorials/how-to-set-up-object-storage-with-django
 
-AWS_DEFAULT_ACL = None
-AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_ENDPOINT_URL = 'https://' + config('AWS_S3_ENDPOINT_URL')
-AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',
-}
-AWS_LOCATION = 'static'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR),"static","staticfiles")
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR),'media')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-STATIC_URL = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
 
-#MEDIA_URL = '/media/'
-#MEDIA_ROOT = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, 'media')
-
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-#For offline testing we used static folder outside the BASE_DIR
-'''
-if DEBUG:
-    MEDIA_URL = '/media/'
-    STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR),"static","static-only")
-    MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR),"static","media")
-    STATICFILES_DIRS = (
-        os.path.join(os.path.dirname(BASE_DIR),"static","static"),
-    )
-'''
-
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'mraduldubeymd19@gmail.com'
-EMAIL_HOST_PASSWORD = 'xxxxxxxxxxxxxxxxx'
-EMAIL_PORT = '587'
-EMAIL_USE_TLS = True
-
+# Custom login vals
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_URL = 'logout'
 LOGOUT_REDIRECT_URL = 'home'
 
-SITE_ID=1
-
 #Paypal vals
 PAYPAL_TEST = True
-PAYPAL_RECEIVER_EMAIL = EMAIL_HOST
+PAYPAL_RECEIVER_EMAIL = 'postmaster@mg.jacktimmins.com'
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.sites',
     'storages',
@@ -119,7 +94,7 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
-ROOT_URLCONF = 'box_office.urls'
+ROOT_URLCONF = 'boxioffice.urls'
 
 TEMPLATES = [
     {
@@ -152,14 +127,19 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-WSGI_APPLICATION = 'box_office.wsgi.application'
+WSGI_APPLICATION = 'boxioffice.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = herokuify.get_db_config()
-
+#DATABASES = herokuify.get_db_config()
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -201,6 +181,16 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 SOCIAL_AUTH_GITHUB_KEY = config('SOCIAL_AUTH_GITHUB_KEY')
 SOCIAL_AUTH_GITHUB_SECRET = config('SOCIAL_AUTH_GITHUB_SECRET')
 
+
+import herokuify
+from herokuify.aws import *                 # AWS access keys as configured in env
+from herokuify.mail.mailgun import *        # Email settings for Mailgun add-on
+from herokuify.common import *              # Common settings, SSL proxy header
+
+DATABASES = herokuify.get_db_config()       # Database config
+CACHES = herokuify.get_cache_config()       # Cache config for Memcache/MemCachier
+
 # Activate Django-Heroku.
 if not ISLOCAL:
-    django_heroku.settings(locals())
+    #django_heroku.settings(locals())
+    

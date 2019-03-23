@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from paypal.standard.forms import PayPalPaymentsForm
 
-from box_office.settings import EMAIL_HOST
+from boxioffice.settings import EMAIL_HOST
 from .forms import BookingForm, SelectedTicketForm
 import datetime
 import uuid

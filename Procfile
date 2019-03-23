@@ -1,1 +1,1 @@
-web: gunicorn box_office.wsgi
+web: gunicorn boxioffice.wsgi

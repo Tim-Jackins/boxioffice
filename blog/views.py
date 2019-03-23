@@ -7,6 +7,8 @@ from .forms import NewPostForm
 from django.contrib.auth.decorators import login_required
 from markdownx.fields import MarkdownxFormField
 from django.urls import reverse
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 def post_list(request):
     print(Post.objects.all().order_by('published_date'))
@@ -17,9 +19,9 @@ def post_list(request):
 def make_post(request):
     if request.POST:
         newPost = Post(
-            author=request.POST.get('author'),
+            author=User.objects.get(pk=request.POST.get('author')),
             title=request.POST.get('title'),
-            text=request.POST.get('text'),
+            content=request.POST.get('text'),
         )
 
         newPost.save()

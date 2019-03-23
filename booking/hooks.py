@@ -1,6 +1,6 @@
 from paypal.standard.models import ST_PP_COMPLETED
 from paypal.standard.ipn.signals import valid_ipn_received
-from box_office.settings import EMAIL_HOST
+from boxioffice.settings import EMAIL_HOST
 
 def show_me_the_money(sender, **kwargs):
     ipn_obj = sender

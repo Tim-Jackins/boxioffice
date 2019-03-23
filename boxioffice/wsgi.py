@@ -1,5 +1,5 @@
 """
-WSGI config for box_office project.
+WSGI config for boxioffice project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -13,7 +13,7 @@ from django.core.wsgi import get_wsgi_application
 from whitenoise.django import DjangoWhiteNoise
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "box_office.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "boxioffice.settings")
 
 application = get_wsgi_application()
 application = DjangoWhiteNoise(application)
