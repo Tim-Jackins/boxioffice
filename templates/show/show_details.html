@@ -32,7 +32,7 @@
     <div class="form-group">
       <label class="col-sm-2 control-label">Runtime</label><br>
       <div class="col-sm-10">
-        <p class="form-control-static">{{ show_info.run_length }} minutes</p>
+        <p class="form-control-static">{{ show_info.length }}</p>
       </div>
     </div>
 
@@ -50,10 +50,17 @@
       <div class="media-body">
         <ul>
           <li><a href="{% url 'reserve_seat' showing.id %}" style="margin:15px;" role="button" class="btn btn-primary btn-sm">Buy Tickets</a> 
-            {{ showing.datetime }} in {{ showing.theater }}</li>
+            {{ showing.datetime }} in <a href="{{ showing.theater.location_link }}" target="_blank">{{ showing.theater }}</a></li>
         </ul>
       </div>
+      <details>
+        <summary><button type="button" class="btn btn-secondary">Map</button></summary>
+        <p>
+          <iframe src="{{ showing.theater.frame_link }}" width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+        </p>
+      </details>
     </div>
+    <hr>
     {% endfor %}
   </div>
 </div>

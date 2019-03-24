@@ -16,6 +16,13 @@ from .forms import BookingForm, SelectedTicketForm
 import datetime
 import uuid
 
+def getAvailableTickets(allTickets):
+	availableTickets = []
+	for ticket in allTickets:
+		if not BookedTicket.objects.filter(ticket=ticket).exists():
+			availableTickets.append(ticket)
+	return availableTickets
+
 @login_required
 def reserve_seat(request, pk):
 	try:
@@ -33,35 +40,47 @@ def payment_gateway(request):
 	if request.POST:
 		number_of_tickets = int(request.POST.get('number_of_tickets'))
 		showing_id = request.POST.get('showing_id')
-
 		showing = Showing.objects.get(pk=showing_id)
-		print(f'Seats={number_of_tickets} show: {showing}')
+		availableTickets = getAvailableTickets(Ticket.objects.all())
 
-		allTickets = Ticket.objects.filter(showing=showing)
+		if number_of_tickets > len(availableTickets):
+			context = {
+				'show_id': showing.show.id,
+				'tickets_left': len(availableTickets),
+			}
+			return render(request, 'booking/not_enough_tickets.html', context)
 		
-		openTickets = []
 
-		for ticket in allTickets:
-			try:
-				BookedTicket.objects.get(ticket=ticket)
-			except:
-				openTickets.append(ticket)
+		'''
+			print(f'Seats={number_of_tickets} show: {showing}')
 
-		if len(openTickets) < number_of_tickets:
-			return redirect(reverse('seatnotfound'))
+			if number_of_tickets < 
+
+			allTickets = Ticket.objects.filter(showing=showing)
+			
+			openTickets = []
+
+			for ticket in allTickets:
+				try:
+					BookedTicket.objects.get(ticket=ticket)
+				except:
+					openTickets.append(ticket)
+
+			if len(openTickets) < number_of_tickets:
+				return redirect(reverse('seatnotfound'))
+			
+			form = BookingForm()
+		'''
 		
-		form = BookingForm()
-
-		#total_price = '${:,.2f}'.format(ticket_price * number_of_tickets)
 		total_price = showing.cost * number_of_tickets
-
+		invoice_uuid = uuid.uuid4
 		
 		# What you want the button to do.
 		paypal_dict = {
 			"business": EMAIL_HOST,
 			"amount": total_price,
 			"item_name": f'{number_of_tickets} tickets for {showing}',
-			"invoice": uuid.uuid4,
+			"invoice": invoice_uuid,
 			'currency_code' : 'USD',
 			"notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
 			"return": request.build_absolute_uri(reverse('payment_gateway')),
@@ -74,10 +93,12 @@ def payment_gateway(request):
 			'number_of_tickets' : number_of_tickets,
 			'showing' : showing,
 			'form' : form,
-			'total_price' : total_price
+			'total_price' : total_price,
+			'invoice': invoice_uuid,
 		}
 		
 		return render(request, 'booking/payment_gateway.html', context)
+
 	else:
 		return redirect('/booking/')
 
@@ -88,31 +109,33 @@ def payment_confirmation(request):
 	showing = Showing.objects.get(pk=showing_id)
 	number_of_tickets = eval(request.POST.get('number_of_tickets'))
 
+	paid_amount=eval(request.POST.get('amount').replace('$', ''))
+	paid_by= request.user
+	invoice=request.POST.get('invoice')
+
+	# For now generate booking on payment confirmation
 	booking = Booking(
-		paid_amount=eval(request.POST.get('amount').replace('$', '')),
-		paid_by=request.user,
+		paid_amount=paid_amount,
+		paid_by=paid_by,
+		invoice=invoice,
 	)
 
 	booking.save()
-
-	allTickets = Ticket.objects.filter(showing=showing)
+	print(booking.id)
 	
-	openTickets = []
+	tickets = getAvailableTickets(Ticket.objects.all())[:number_of_tickets]
 
-	for ticket in allTickets:
-		try:
-			BookedTicket.objects.get(ticket=ticket)
-		except:
-			openTickets.append(ticket)
-
-	for ticketIndex in range(number_of_tickets):
+	print(f'Booking these tickets: {tickets}')
+	
+	for ticket in tickets:
 		tempBookedTicket = BookedTicket(
-			ticket=openTickets[ticketIndex],
+			ticket=ticket,
 			booking=booking,
 		)
 		tempBookedTicket.save()
 	
 	return render(request, 'booking/payment_confirmation.html')
+
 
 @csrf_exempt
 def payment_cancelled(request):

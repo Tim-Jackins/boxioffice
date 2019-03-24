@@ -1,0 +1,14 @@
+{% extends "common/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}
+    <title>CHS Theatre | Not Enough Tickets</title>
+{% endblock %}
+
+{% block content %}
+	<h1>Not enough tickets!?</h1>
+    <p>We only have {{ tickets_left }} tickets</p>
+    <p><a class="btn btn-primary" href="{% url 'show_details' pk=show_id %}">Back to booking</a></p>
+    <p><a class="btn btn-info" href="{% url 'home' %}">Home</a></p>
+    
+
+{% endblock %}

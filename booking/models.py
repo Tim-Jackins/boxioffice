@@ -9,7 +9,7 @@ import uuid
 from django.db import models
 from djmoney.models.fields import MoneyField
 from django.contrib.auth import get_user_model
-
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 class Show(models.Model):
     lang_choice = (
@@ -21,6 +21,10 @@ class Show(models.Model):
     language            = models.CharField(max_length=10, choices=lang_choice)
     run_length          = models.IntegerField(help_text="Enter run length in minute's", null=True, blank=True)
     image               = models.ImageField(null=True, blank=True, upload_to='media')
+
+    @property
+    def length(self):
+        return f'{self.run_length} minutes'
 
     def __str__(self):
         return self.name
@@ -42,28 +46,26 @@ class Showing(models.Model):
     theater             = models.ForeignKey('Theater', on_delete=models.CASCADE,null=True,blank=True)
     cost                = MoneyField(max_digits=14, decimal_places=2, default_currency='USD')
 
+    def generateTickets(self):
+        try:
+            Ticket.objects.get(showing=self)
+        except ObjectDoesNotExist:
+            showingTickets = []
+            print(f'Generating tickets for showing {self.show} at {self.datetime}')
+            for each in range(self.theater.max_occupancy):
+                showingTickets.append(Ticket(showing=self))
+            Ticket.objects.bulk_create(showingTickets)
+        except:
+            print('Ticket\'s have already been generated')
 
-    @classmethod
-    def create(cls, datetime, show, theater, cost):
-        showing = cls(
-            datetime=datetime,
-            show=show,
-            theater=theater,
-            cost=cost,
-        )
-
-        showingTickets = []
-        print(f'Generating tickets for showing {Showing}')
-        showings = Showing.objects.all()
-        newShowing = showings[len(showings) - 1]
-        for i in range(self.theater.max_occupancy):
-            showingTickets.append(Ticket(showing=newShowing))
-        Ticket.objects.bulk_create(showingTickets)
-        
-        return showing
 
     def __str__(self):
-        return f'{self.show} at {self.datetime}'
+        try:
+            Ticket.objects.get(showing=self)
+        except ObjectDoesNotExist:
+            return 'SHOW HAS NO TICKETS'
+        except:
+            return f'{self.show} at {self.datetime}'
 
 
 class Booking(models.Model):
@@ -83,13 +85,12 @@ class Booking(models.Model):
 
 class Ticket(models.Model):
     showing             = models.ForeignKey(Showing, on_delete=models.CASCADE)
-
+    uuid                = models.UUIDField(default=uuid.uuid4, editable=False)
+    
     def __str__(self):
-        return f'{self.id}'
-
+        return f'{self.uuid}'
 
 class BookedTicket(models.Model):
-    uuid                = models.UUIDField(default=uuid.uuid4, editable=False)
     ticket              = models.OneToOneField(Ticket, on_delete=models.CASCADE)
     booking             = models.ForeignKey(Booking, on_delete=models.CASCADE)
 

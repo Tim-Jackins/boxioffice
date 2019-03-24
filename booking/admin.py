@@ -18,13 +18,6 @@ class TheaterAdmin(admin.ModelAdmin):
 admin.site.register(Theater,TheaterAdmin)
 
 
-class ShowingAdmin(admin.ModelAdmin):
-	class Meta:
-		model = Showing
-
-admin.site.register(Showing,ShowingAdmin)
-
-
 class BookingAdmin(admin.ModelAdmin):
 	class Meta:
 		model = Booking
@@ -37,6 +30,21 @@ class TicketAdmin(admin.ModelAdmin):
 		model = Ticket
 
 admin.site.register(Ticket,TicketAdmin)
+
+
+def makeTickets(modeladmin, request, queryset):
+	for showing in queryset:
+		showing.generateTickets()
+makeTickets.short_description = 'Generate Tickets'
+
+
+class ShowingAdmin(admin.ModelAdmin):
+	class Meta:
+		model = Showing
+
+	actions = [makeTickets, ]
+
+admin.site.register(Showing,ShowingAdmin)
 
 
 class BookedTicketAdmin(admin.ModelAdmin):

@@ -50,9 +50,15 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_URL = 'logout'
 LOGOUT_REDIRECT_URL = 'home'
 
-#Paypal vals
+# Mailgun cred
+EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
+MAILGUN_ACCESS_KEY = '56284009ca389b4f813d42e544aef62f-985b58f4-0231c0e2'
+MAILGUN_SERVER_NAME = 'https://api.mailgun.net/v3/mg.jacktimmins.com'
+EMAIL_HOST = 'postmaster@mg.jacktimmins.com'
+
+#Paypal cred
 PAYPAL_TEST = True
-PAYPAL_RECEIVER_EMAIL = 'postmaster@mg.jacktimmins.com'
+PAYPAL_RECEIVER_EMAIL = EMAIL_HOST
 
 
 # Application definition
@@ -182,15 +188,6 @@ SOCIAL_AUTH_GITHUB_KEY = config('SOCIAL_AUTH_GITHUB_KEY')
 SOCIAL_AUTH_GITHUB_SECRET = config('SOCIAL_AUTH_GITHUB_SECRET')
 
 
-import herokuify
-from herokuify.aws import *                 # AWS access keys as configured in env
-from herokuify.mail.mailgun import *        # Email settings for Mailgun add-on
-from herokuify.common import *              # Common settings, SSL proxy header
-
-DATABASES = herokuify.get_db_config()       # Database config
-CACHES = herokuify.get_cache_config()       # Cache config for Memcache/MemCachier
-
 # Activate Django-Heroku.
-if not ISLOCAL:
+#if not ISLOCAL:
     #django_heroku.settings(locals())
-    

@@ -13,7 +13,7 @@
 		<form method="POST" action="{% url 'payment_confirmation' %}">
 			{% csrf_token %}
 			<input type="hidden" id="showing_id" name="showing_id" value="{{ showing.id }}">
-			<input type="hidden" id="possibleBookingUuid" name="possibleBookingUuid" value="{{ possibleBookingUuid }}">
+			<input type="hidden" id="invoice" name="invoice" value="{{ invoice }}">
 			Show:<input id="showing" name="showing" value="{{ showing.show }}" readonly><br>
 			Theatre:<input id="theater" name="theater" value="{{ showing.theater }}"  readonly><br>
 			Showtime:<input id="showtime" name="showtime" value="{{ showing.datetime }}"  readonly><br>
