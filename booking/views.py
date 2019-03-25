@@ -231,8 +231,8 @@ def show_index(request):
 	for show in show_list:
 		tempShowing = show.showing_set.order_by('datetime')
 		date_details += [{
-			'start_date' : tempShowing[0].datetime.strftime('%b. %w'),
-			'end_date' : tempShowing[len(tempShowing) - 1].datetime.strftime('%b. %w'),
+			'start_date' : show.showing_set.order_by('datetime').first().datetime.strftime('%b. %d'),
+			'end_date' : show.showing_set.order_by('datetime').last().datetime.strftime('%b. %d'),
 		}]
 
 	return render(request, 'common/booking.html', {'all_details_list' : zip(show_list, date_details)})
