@@ -27,11 +27,16 @@
                 <li><a href="{% url 'home' %}">Home</a></li>
                 <li><a href="{% url 'blog' %}">Blog</a></li>
                 <li><a href="{% url 'booking' %}">Booking</a></li>
-                <li><a href="#">Resources</a></li>
+                
                 {% if not request.user.is_authenticated %}
                 <li><a href="{% url 'login' %}">Login</a></li>
                 {% else %}
-                <li><a href="#">Admin Tools</a> </a></li>
+                
+                {% if request.user.is_superuser %}
+                <li><a href="{% url 'adminTools' %}">Admin Tools</a> </a></li>
+                {% endif %}
+                
+                <li><a href="{% url 'ticket_list' %}">My Tickets</a> </a></li>
                 <li><a href="{%url 'logout' %}">Logout</a></li>
                 {% endif %}
 

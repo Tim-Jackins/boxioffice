@@ -1,0 +1,14 @@
+{% extends "common/base.html" %}
+
+{% block title %}
+    <title>CHS Theatre | Admin Tools</title>
+{% endblock %}
+
+{% block content %}
+    
+    <h1>Admin tools</h1>
+    <p><a class="btn btn-primary" href="{% url 'new_post' %}">New post</a></p>
+    <p><a class="btn btn-primary" href="/admin">Admin menu</a></p>
+    <p><a class="btn btn-primary" href="#">Scanner <i>coming soon</i></a></p>
+
+{% endblock %}

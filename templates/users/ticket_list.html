@@ -1,0 +1,18 @@
+{% extends "common/base.html" %}
+
+{% block title %}
+<title>CHS Theatre | Tickets</title>
+{% endblock %}
+
+{% block content %}
+
+<h1>Your tickets</h1>
+{% for bookedTicket in bookedTickets %}
+
+<p>Showing: {{ bookedTicket.ticket.showing }}</p>
+<p>Ticket uuid: {{ bookedTicket.ticket.uuid }}</p>
+<hr>
+
+{% endfor %}
+
+{% endblock %}

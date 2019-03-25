@@ -5,6 +5,7 @@
 {% block content %}
 
 {% load crispy_forms_tags %}
+{% load blog_extras %}
 <form role="form" method="POST" action="{% url 'new_post' %}">
     {% csrf_token %}
     <input type=hidden name="author" value="{{ user.id }}" />
