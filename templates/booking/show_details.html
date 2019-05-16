@@ -1,0 +1,110 @@
+{% extends "common/base.html" %}
+
+{% block title %}
+<title>Waves theater | Movie Details</title>
+{% endblock %}
+
+{% block content %}
+
+{% load static %}
+
+<div class="media">
+  <div class="media-left">
+    <a href="#">
+      <div class="imgbox">
+        <img class="center-fit" src="{{ MEDIA_URL }}/media/{{ show_info.image }}" alt="{{ show_info.name }}">
+      </div>
+    </a>
+  </div>
+  <br>
+  <div class="media-body form-horizontal">
+    <h4 class="media-heading">{{ show_info.name }}</h4>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Director</label><br>
+      <div class="col-sm-10">
+        <p class="form-control-static">{{ show_info.director }}</p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Language</label><br>
+      <div class="col-sm-10">
+        <p class="form-control-static">{{ show_info.language }}</p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Runtime</label><br>
+      <div class="col-sm-10">
+        <p class="form-control-static">{{ show_info.length }}</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Showings</h3>
+  </div>
+  <div class="panel-body">
+<!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+
+      <div id="like_button_container"><button>Like</button></div>
+    <script>
+      'use strict'
+
+      const e = React.createElement
+
+      class LikeButton extends React.Component {
+        constructor(props) {
+          super(props)
+          this.state = { liked: false }
+        }
+
+        render() {
+          if (this.state.liked) {
+            return 'You liked this.'
+          }
+
+          return e(
+            'button',
+            { onClick: () => this.setState({ liked: true }) },
+            'Like'
+          );
+        }
+      }
+
+      const domContainer = document.querySelector('#like_button_container')
+      ReactDOM.render(e(LikeButton), domContainer)
+    </script>
+
+    <div id="checkout_app"></div>
+
+    <script>
+      Window.props = "{{ props | safe }}"
+    </script>
+
+    <script src="{% static 'js/SeatSelector.js' %}"></script>
+
+    <!--{% for showing in showing_list %}
+<div class="media">
+  <div class="media-body">
+    <ul>
+      <li><a href="{% url 'reserve_seat' showing.id %}" style="margin:15px;" role="button" class="btn btn-primary btn-sm">Buy Tickets</a> 
+        {{ showing.datetime }} in <a href="{{ showing.theater.location_link }}" target="_blank">{{ showing.theater }}</a></li>
+    </ul>
+  </div>
+  <details>
+    <summary><button type="button" class="btn btn-secondary">Map</button></summary>
+    <p>
+      <iframe src="{{ showing.theater.frame_link }}" width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+    </p>
+  </details>
+</div>
+<hr>
+{% endfor %}-->
+  </div>
+</div>
+
+{% endblock %}

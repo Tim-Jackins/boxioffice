@@ -85,6 +85,10 @@ INSTALLED_APPS = [
     'social_django',
     'markdownx',
     'users.apps.UsersConfig',
+    'qr_code',
+
+    'rest_framework',
+    'webpack_loader',
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'

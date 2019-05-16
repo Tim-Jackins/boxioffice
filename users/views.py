@@ -22,6 +22,7 @@ def AdminTools(request):
 def listTickets(request):
     userOwnedBookings = Booking.objects.all().filter(paid_by=request.user).order_by('datetime')
     userOwnedTickets = []
+    #print(user)
 
     for booking in userOwnedBookings:
         for bookedTicket in BookedTicket.objects.all().filter(booking=booking):
