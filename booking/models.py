@@ -11,7 +11,9 @@ from djmoney.models.fields import MoneyField
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 import jsonfield
+import pprint
 
+pp = pprint.PrettyPrinter(indent=4)
 
 defaultSeatChart = '''{
     "seatLayout": {
@@ -446,11 +448,26 @@ class Showing(models.Model):
             Ticket.objects.get(showing=self)
         except ObjectDoesNotExist:
             showingTickets = []
+
+            seatChart = self.show.theater.seating_chart['seatLayout']['colAreas']['objArea']
+            
+            for section in seatChart:
+                for row in section['objRow']:
+                    for seat in row['objSeat']:
+                        showingTickets.append(
+                            Ticket(
+                                showing=self,
+                                AreaDesc=section['AreaDesc'],
+                                PhyRowId=row['PhyRowId'],
+                                SeatNumber=seat['SeatNumber'],
+                            )
+                        )
+
             print(
                 f'Generating tickets for showing {self.show} at {self.datetime}')
-            for each in range(self.show.theater.max_occupancy):
-                showingTickets.append(Ticket(showing=self))
+            
             Ticket.objects.bulk_create(showingTickets)
+            
         except:
             print('Ticket\'s have already been generated')
 
@@ -482,15 +499,21 @@ class Booking(models.Model):
 
 
 class Ticket(models.Model):
+    AreaDesc = models.CharField(default='standard', max_length=20)
+    PhyRowId = models.CharField(default='A', max_length=20)
+    SeatNumber = models.IntegerField(default=1)
+
+    available = models.BooleanField(default=True)
+
     showing = models.ForeignKey(Showing, on_delete=models.CASCADE)
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     def __str__(self):
-        return f'{self.uuid}'
+        return f'{self.AreaDesc}-{self.PhyRowId}-{self.SeatNumber}-{self.showing}'
 
 
 class BookedTicket(models.Model):
     ticket = models.OneToOneField(Ticket, on_delete=models.CASCADE)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
 
     def __str__(self):

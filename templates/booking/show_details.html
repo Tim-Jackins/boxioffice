@@ -1,9 +1,5 @@
 {% extends "common/base.html" %}
 
-{% block title %}
-<title>Waves theater | Movie Details</title>
-{% endblock %}
-
 {% block content %}
 
 {% load static %}
@@ -12,7 +8,7 @@
   <div class="media-left">
     <a href="#">
       <div class="imgbox">
-        <img class="center-fit" src="{{ MEDIA_URL }}/media/{{ show_info.image }}" alt="{{ show_info.name }}">
+        <img style="width: 100px" class="center-fit" src="{{ MEDIA_URL }}/media/{{ show_info.image }}" alt="{{ show_info.name }}">
       </div>
     </a>
   </div>
@@ -43,49 +39,33 @@
 
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h3 class="panel-title">Showings</h3>
+    <h3 class="panel-title">Buy tickets</h3>
   </div>
   <div class="panel-body">
+
 <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
 <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
 
-      <div id="like_button_container"><button>Like</button></div>
+<script src="{% static 'js/SeatSelector.js' %}"></script>
+<script src="{% static 'js/Cart.js' %}"></script>
+<script src="{% static 'js/SeatingGrid.js' %}"></script>
+
+<form method='POST' action="{% url 'payment_gateway' %}">
+  {% csrf_token %}
+      <div id="checkout_app">
+        Loading...
+      </div>
+    </form>
+
     <script>
+      window.props = {{ props|safe }}
+      
       'use strict'
-
-      const e = React.createElement
-
-      class LikeButton extends React.Component {
-        constructor(props) {
-          super(props)
-          this.state = { liked: false }
-        }
-
-        render() {
-          if (this.state.liked) {
-            return 'You liked this.'
-          }
-
-          return e(
-            'button',
-            { onClick: () => this.setState({ liked: true }) },
-            'Like'
-          );
-        }
-      }
-
-      const domContainer = document.querySelector('#like_button_container')
-      ReactDOM.render(e(LikeButton), domContainer)
+      
+      const checkoutDomContainer = document.querySelector('#checkout_app');
+      ReactDOM.render(React.createElement(SeatSelector, window.props), checkoutDomContainer);
     </script>
-
-    <div id="checkout_app"></div>
-
-    <script>
-      Window.props = "{{ props | safe }}"
-    </script>
-
-    <script src="{% static 'js/SeatSelector.js' %}"></script>
 
     <!--{% for showing in showing_list %}
 <div class="media">

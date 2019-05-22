@@ -1,6 +1,4 @@
-import { Component, createElement } from 'react';
-
-class Cart extends Component {
+class Cart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -24,7 +22,7 @@ class Cart extends Component {
       this.setState({
         propCartInfo: this.props.cartInfo
       });
-      console.log('another test');
+      
       this.updateCart();
     }
   }
@@ -44,9 +42,9 @@ class Cart extends Component {
         });
       }
     } else {
-      tempCartInfo = propsCartInfo;
+      tempCartInfo = JSON.parse(propsCartInfo)
     } //this.setState({ cartInfo: tempCartInfo })
-
+    
 
     if (tempCartInfo) {
       const cartInfo = tempCartInfo; //this.state.cartInfo
@@ -55,30 +53,36 @@ class Cart extends Component {
       let items = [];
 
       for (let i = 0; i < cartInfo.length; i++) {
-        items.push(createElement('li', {
+        items.push(React.createElement('li', {
           className: 'list-group-item d-flex justify-content-between lh-condensed'
-        }, [createElement('div', {}, [createElement('h6', {
+        }, [React.createElement('div', {}, [React.createElement('h6', {
           className: 'my-0'
-        }, cartInfo[i].id), createElement('small', {
+        }, cartInfo[i].id), React.createElement('small', {
           className: 'text-muted'
-        }, cartInfo[i].desc)]), createElement('span', {
+        }, cartInfo[i].desc)]), React.createElement('span', {
           className: 'text-muted'
         }, '$' + parseFloat(cartInfo[i].cost).toFixed(2))]));
         cost += parseFloat(cartInfo[i].cost);
       }
 
       this.setState({
-        cartHTML: createElement("div", null, createElement("h4", {
+        cartHTML: React.createElement("div", null, React.createElement("h4", {
           className: "d-flex justify-content-between align-items-center mb-3"
-        }, createElement("span", {
+        }, React.createElement("span", {
           className: "text-muted"
-        }, "Your cart"), createElement("span", {
+        }, "Your cart"), React.createElement("span", {
           className: "badge badge-secondary badge-pill"
-        }, cartInfo.length)), createElement("ul", {
+        }, cartInfo.length)), React.createElement("ul", {
           className: "list-group mb-3"
-        }, items, createElement("li", {
+        }, items, React.createElement("li", {
           className: "list-group-item d-flex justify-content-between"
-        }, createElement("span", null, "Total (USD)"), createElement("strong", null, "$", cost.toFixed(2)))))
+        }, React.createElement("span", null, "Total (USD)"), React.createElement("strong", null, "$", cost.toFixed(2)))),
+          React.createElement('input', {
+            type: 'hidden',
+            name: 'total_cost',
+            value: cost.toFixed(2)
+          })
+        )
       });
     }
 
@@ -86,9 +90,6 @@ class Cart extends Component {
   }
 
   render() {
-    return createElement("div", null, this.state.cartHTML);
+    return React.createElement("div", null, this.state.cartHTML)
   }
-
 }
-
-export default Cart;

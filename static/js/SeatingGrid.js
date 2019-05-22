@@ -1,8 +1,4 @@
-import React, { Component, createElement } from 'react';
-import './SeatingGrid.css';
-import './cursors.css';
-
-class Seat extends Component {
+class Seat extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -57,7 +53,7 @@ class Seat extends Component {
 
 }
 
-class SeatingGrid extends Component {
+class SeatingGrid extends React.Component {
   constructor(props) {
     super(props);
     this.seatLayout = props.seatingData.seatLayout;
@@ -82,7 +78,7 @@ class SeatingGrid extends Component {
       let seat = seatRow.objSeat[realSeatIndex];
 
       if (seat == null) {
-        row.push(createElement('li', {
+        row.push(React.createElement('li', {
           className: 'seat-row-seat'
         }));
       } else if (seat.GridSeatNum === seatGridNum) {
@@ -105,7 +101,7 @@ class SeatingGrid extends Component {
         }));
         realSeatIndex++;
       } else {
-        row.push(createElement('li', {
+        row.push(React.createElement('li', {
           className: 'seat-row-seat'
         }));
       }
@@ -168,5 +164,3 @@ class SeatingGrid extends Component {
   }
 
 }
-
-export default SeatingGrid;

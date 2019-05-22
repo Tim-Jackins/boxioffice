@@ -1,0 +1,33 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+
+{% load static %}
+
+<div id="cart"></div>
+</div>
+<script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="{{ stripePubKey }}"
+  data-amount="{{ total_cost }}" data-name="Theatre CHS" data-description="Finish purchasing tickets"
+  data-image="{% static 'img/logo.png' %}" data-locale="auto" data-currency="usd" data-allow-remember-me="false">
+  </script>
+
+
+<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+<script src="{% static 'js/Cart.js' %}"></script>
+
+<script>
+
+console.log('test')
+window.props = {{ props|safe }}
+console.log(window.props)
+
+</script>
+
+<script>
+  const checkoutDomContainer = document.querySelector('#cart')
+  ReactDOM.render(React.createElement(Cart, window.props), checkoutDomContainer)
+</script>
+
+
+{% endblock %}

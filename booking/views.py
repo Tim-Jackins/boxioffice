@@ -14,11 +14,12 @@ from django.http import Http404, JsonResponse
 
 from paypal.standard.forms import PayPalPaymentsForm
 
-from boxioffice.settings import EMAIL_HOST
+from boxioffice.settings import EMAIL_HOST, STRIPE_PUBLISHABLE_KEY
 from .forms import BookingForm, SelectedTicketForm
 import datetime
 import uuid
 import json
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 def getAvailableTickets(allTickets):
@@ -41,9 +42,49 @@ def reserve_seat(request, pk):
     return render(request, 'booking/reserve_seat.html', context)
 
 
+@csrf_exempt
+def payment_cancelled(request):
+    return render(request, 'booking/payment_cancelled.html')
+
+
 @login_required
 def payment_gateway(request):
     if request.POST:
+        showId = json.loads(request.POST.get('showId'))
+        show = Show.objects.get(pk=showId)
+
+        seatsToBuy = json.loads(request.POST.get('Seats'))
+        date = request.POST.get('Date')
+        total_cost = request.POST.get('total_cost')
+
+        q1 = Showing.objects.filter(show=show)
+        print()
+        print('DATA')
+        
+        #print(q1[0].datetime)
+
+        #'2019-05-20 16:14:18+00:00'
+        
+        showing = q1.get(datetime=datetime.datetime.strptime(date, '%c').strftime('%Y-%m-%d %H:%M:%S+00:00'))
+
+        props = {
+            'cartInfo': json.dumps(seatsToBuy, cls=DjangoJSONEncoder)
+        }
+
+        context = {
+            'props': props,
+            'showId': json.dumps(showId, cls=DjangoJSONEncoder),
+            'date': json.dumps(date, cls=DjangoJSONEncoder),
+            'showing_id': showing.id,
+            'stripePubKey': STRIPE_PUBLISHABLE_KEY,
+            'total_cost': total_cost
+        }
+        print(context)
+        print()
+
+        return render(request, 'booking/checkout.html', context)
+
+        ''' 
         number_of_tickets = int(request.POST.get('number_of_tickets'))
         showing_id = request.POST.get('showing_id')
         showing = Showing.objects.get(pk=showing_id)
@@ -56,7 +97,7 @@ def payment_gateway(request):
             }
             return render(request, 'booking/not_enough_tickets.html', context)
 
-        '''
+        ''''''
             print(f'Seats={number_of_tickets} show: {showing}')
 
             if number_of_tickets < 
@@ -74,26 +115,13 @@ def payment_gateway(request):
             if len(openTickets) < number_of_tickets:
                 return redirect(reverse('seatnotfound'))
             
-            form = BookingForm()
+            form = BookingForm()'''
         '''
 
         total_price = showing.cost * number_of_tickets
         invoice_uuid = uuid.uuid4
 
-        # What you want the button to do.
-        paypal_dict = {
-            "business": EMAIL_HOST,
-            "amount": total_price,
-            "item_name": f'{number_of_tickets} tickets for {showing}',
-            "invoice": invoice_uuid,
-            'currency_code': 'USD',
-            "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
-            "return": request.build_absolute_uri(reverse('payment_gateway')),
-            "cancel_return": request.build_absolute_uri(reverse('payment_cancelled')),
-        }
-
-        form = PayPalPaymentsForm(initial=paypal_dict)
-
+        
         context = {
             'number_of_tickets': number_of_tickets,
             'showing': showing,
@@ -103,13 +131,16 @@ def payment_gateway(request):
         }
 
         return render(request, 'booking/payment_gateway.html', context)
+        '''
 
     else:
         return redirect('/booking/')
 
 
-@csrf_exempt
+@login_required
 def payment_confirmation(request):
+
+    '''
     showing_id = request.POST.get('showing_id')
     showing = Showing.objects.get(pk=showing_id)
     number_of_tickets = eval(request.POST.get('number_of_tickets'))
@@ -140,11 +171,61 @@ def payment_confirmation(request):
         tempBookedTicket.save()
 
     return render(request, 'booking/payment_confirmation.html')
+    '''
 
 
-@csrf_exempt
-def payment_cancelled(request):
-    return render(request, 'booking/payment_cancelled.html')
+class ShowDetails(View):
+    template = 'booking/show_details.html'
+    def get(self, request, pk, *args, **kwargs):
+        try:
+
+            show = Show.objects.get(pk=pk)
+            seatChart = show.theater.seating_chart['seatLayout']['colAreas']['objArea']
+            
+
+            showing_list = Showing.objects.filter(show=pk).order_by('datetime')
+            
+            dateDict = {}
+            
+            dictLength = 0
+            for showing in showing_list:
+                tempSoldTickets = []
+                for ticket in Ticket.objects.filter(showing=showing).filter(available=False):
+                    tempSoldTickets.append({
+                        'AreaDesc': ticket.AreaDesc,
+                        'PhyRowId': ticket.PhyRowId,
+                        'SeatNumber': ticket.SeatNumber
+                    })
+
+                dateDict.update({
+                    str(dictLength): {
+                        'date': showing.datetime.strftime('%c'),
+                        'soldSeats': [ tempSoldTickets ]
+                    }
+                })
+                
+                dictLength += 1
+            dateDict.update({ 'length': dictLength })
+            
+            print(dateDict)
+
+            theater = show.theater
+        except Show.DoesNotExist:
+            raise Http404("Show does not exist")
+
+        props = {
+            'seatDataJSON': json.dumps(theater.seating_chart, cls=DjangoJSONEncoder),
+            'dateDataJSON': json.dumps(dateDict, cls=DjangoJSONEncoder),
+            'showId': pk
+        }
+
+        context = {
+            'props': props,
+            'show_info': show,
+            'showing_list': showing_list
+        }
+
+        return render(request, self.template, context)
 
 
 def show_list(request):
@@ -163,53 +244,6 @@ def show_list(request):
     show_list.append(show_by_lang)
 
     return render(request, 'booking/show_list.html', {'shows': show_list})
-
-
-class ShowDetails(View):
-    template = 'booking/show_details.html'
-    def get(self, request, pk, *args, **kwargs):
-        try:
-            show_info = Show.objects.get(pk=pk)
-            showing_list = Showing.objects.filter(show=pk).order_by('datetime')
-            dateDict = {'dates': []}
-            for showing in showing_list:
-                dateDict['dates'].append(showing.datetime.strftime('%c'))
-            theater = show_info.theater
-        except Show.DoesNotExist:
-            raise Http404("Show does not exist")
-
-        props = {
-            'seatDataJSON': json.dumps(theater.seating_chart),
-            'dateDataJSON': json.dumps(dateDict),
-        }
-
-        context = {
-            'props': props,
-            'show_info': show_info,
-            'showing_list': showing_list
-        }
-
-        return render(request, self.template, context)
-
-
-def ShowDetailsJSON(request, pk):
-    def get(self, request, pk, *args, **kwargs):
-        try:
-            show_info = Show.objects.get(pk=pk)
-            showing_list = Showing.objects.filter(show=pk).order_by('datetime')
-            dateDict = {'dates': []}
-            for showing in showing_list:
-                dateDict['dates'].append(showing.datetime.strftime('%c'))
-            theater = show_info.theater
-        except Show.DoesNotExist:
-            raise Http404("Show does not exist")
-
-        props = {
-            'seatDataJSON': json.dumps(theater.seating_chart),
-            'dateDataJSON': json.dumps(dateDict),
-        }
-
-        return JsonResponse(props)
 
 
 def theater_list(request):
