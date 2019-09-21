@@ -10,11 +10,12 @@
 
 <h1>Your tickets</h1>
 
+{% if bookedTickets %}
 {% for bookedTicket in bookedTickets %}
 
 <p>Showing: {{ bookedTicket.ticket.showing }}</p>
-<p>Ticket uuid: {{ bookedTicket.ticket.uuid }}</p>
-<p>{% qr_from_text bookedTicket.ticket.uuid size="T" %}</p>
+<p>Ticket uuid: {{ bookedTicket.uuid }}</p>
+<p>{% qr_from_text bookedTicket.uuid size="T" %}</p>
 <!-- Button trigger modal -->
 <!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
         Launch demo modal
@@ -42,7 +43,11 @@
       </div>-->
 
 <hr>
-
 {% endfor %}
+{% else %}
+
+<h3>You have no tickets... Go buy some!</h3>
+
+{% endif %}
 
 {% endblock %}
