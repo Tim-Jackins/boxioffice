@@ -43,13 +43,9 @@
   </div>
   <div class="panel-body">
 
-<!-- Note: when deploying, replace "development.js" with "production.min.js". -->
-<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-
-<script src="{% static 'js/SeatSelector.js' %}"></script>
-<script src="{% static 'js/Cart.js' %}"></script>
-<script src="{% static 'js/SeatingGrid.js' %}"></script>
+<script src="{% static 'js/SeatSelector.jsx' %}" type="text/babel"></script>
+<script src="{% static 'js/Cart.jsx' %}" type="text/babel"></script>
+<script src="{% static 'js/SeatingGrid.jsx' %}" type="text/babel"></script>
 
 <form method='POST' action="{% url 'payment_gateway' %}">
   {% csrf_token %}
@@ -58,7 +54,7 @@
       </div>
     </form>
 
-    <script>
+    <script type="text/babel">
       window.props = {{ props|safe }}
       
       'use strict'

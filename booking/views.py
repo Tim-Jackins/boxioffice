@@ -12,15 +12,18 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404, JsonResponse
 
+import stripe
+
 from paypal.standard.forms import PayPalPaymentsForm
 
-from boxioffice.settings import EMAIL_HOST, STRIPE_PUBLISHABLE_KEY
-from .forms import BookingForm, SelectedTicketForm
+from boxioffice.settings import EMAIL_HOST, STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY
 import datetime
 import uuid
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib import messages
 
+stripe.api_key = STRIPE_SECRET_KEY
 
 def getAvailableTickets(allTickets):
     availableTickets = []
@@ -53,13 +56,23 @@ def payment_gateway(request):
         showId = json.loads(request.POST.get('showId'))
         show = Show.objects.get(pk=showId)
 
-        seatsToBuy = json.loads(request.POST.get('Seats'))
+        try:
+            seatsToBuy = json.loads(request.POST.get('Seats'))
+        except:
+            seatsToBuy = []
+
+        if not len(seatsToBuy):
+            messages.warning(request, "You didn't select any tickets!")
+            return redirect('show_details', showId)
+        
         date = request.POST.get('Date')
-        total_cost = request.POST.get('total_cost')
+        total_cost = float(request.POST.get('total_cost')) * 100
 
         q1 = Showing.objects.filter(show=show)
         print()
         print('DATA')
+        print(total_cost)
+        print()
         
         #print(q1[0].datetime)
 
@@ -79,59 +92,8 @@ def payment_gateway(request):
             'stripePubKey': STRIPE_PUBLISHABLE_KEY,
             'total_cost': total_cost
         }
-        print(context)
-        print()
-
-        return render(request, 'booking/checkout.html', context)
-
-        ''' 
-        number_of_tickets = int(request.POST.get('number_of_tickets'))
-        showing_id = request.POST.get('showing_id')
-        showing = Showing.objects.get(pk=showing_id)
-        availableTickets = getAvailableTickets(Ticket.objects.all())
-
-        if number_of_tickets > len(availableTickets):
-            context = {
-                'show_id': showing.show.id,
-                'tickets_left': len(availableTickets),
-            }
-            return render(request, 'booking/not_enough_tickets.html', context)
-
-        ''''''
-            print(f'Seats={number_of_tickets} show: {showing}')
-
-            if number_of_tickets < 
-
-            allTickets = Ticket.objects.filter(showing=showing)
-            
-            openTickets = []
-
-            for ticket in allTickets:
-                try:
-                    BookedTicket.objects.get(ticket=ticket)
-                except:
-                    openTickets.append(ticket)
-
-            if len(openTickets) < number_of_tickets:
-                return redirect(reverse('seatnotfound'))
-            
-            form = BookingForm()'''
-        '''
-
-        total_price = showing.cost * number_of_tickets
-        invoice_uuid = uuid.uuid4
-
         
-        context = {
-            'number_of_tickets': number_of_tickets,
-            'showing': showing,
-            'form': form,
-            'total_price': total_price,
-            'invoice': invoice_uuid,
-        }
-
-        return render(request, 'booking/payment_gateway.html', context)
-        '''
+        return render(request, 'booking/checkout.html', context)
 
     else:
         return redirect('/booking/')
@@ -139,46 +101,98 @@ def payment_gateway(request):
 
 @login_required
 def payment_confirmation(request):
+    if request.POST:
+        showing = Showing.objects.get(id=request.POST.get('showing_id'))
+        total_cost = request.POST.get('total_cost')
+        Seats = request.POST.get('Seats')
+        stripeToken = request.POST.get('stripeToken')
+        stripeTokenType = request.POST.get('stripeTokenType')
+        stripeEmail = request.POST.get('stripeEmail')
 
-    '''
-    showing_id = request.POST.get('showing_id')
-    showing = Showing.objects.get(pk=showing_id)
-    number_of_tickets = eval(request.POST.get('number_of_tickets'))
-
-    paid_amount = eval(request.POST.get('amount').replace('$', ''))
-    paid_by = request.user
-    invoice = request.POST.get('invoice')
-
-    # For now generate booking on payment confirmation
-    booking = Booking(
-        paid_amount=paid_amount,
-        paid_by=paid_by,
-        invoice=invoice,
-    )
-
-    booking.save()
-    print(booking.id)
-
-    tickets = getAvailableTickets(Ticket.objects.all())[:number_of_tickets]
-
-    print(f'Booking these tickets: {tickets}')
-
-    for ticket in tickets:
-        tempBookedTicket = BookedTicket(
-            ticket=ticket,
-            booking=booking,
+        charge = stripe.Charge.create(
+            amount=int(eval(total_cost)) * 1000,
+            currency='usd',
+            description=Seats,
+            source=stripeToken
         )
-        tempBookedTicket.save()
+        
+        #print(charge)
+        
+        booking = Booking(
+            receipt = charge['receipt_url'],
+            payment_method = 'STRIPE',
+            stripe_id = charge['id'],
+            paid_amount = charge['amount'] / 1000,
+            paid_by = request.user
+        )
+        booking.save()
 
-    return render(request, 'booking/payment_confirmation.html')
-    '''
+        tickets = json.loads(Seats)
+        print(tickets)
+
+        for ticket in tickets:
+            tempTicket = Ticket.objects.filter(showing=showing).get(seatId=ticket['id'])
+
+            tempBookedTicket = BookedTicket(
+                ticket=tempTicket,
+                booking=booking,
+            )
+            tempBookedTicket.save()
+            
+            tempTicket.available = False
+            tempTicket.save()
+        
+
+        context = {
+            ''
+        }
+        
+
+        print(request.POST)
+        
+        return redirect('/booking/')#render(request, 'booking/checkout.html', context)
+
+        '''
+        showing_id = request.POST.get('showing_id')
+        showing = Showing.objects.get(pk=showing_id)
+        number_of_tickets = eval(request.POST.get('number_of_tickets'))
+
+        paid_amount = eval(request.POST.get('amount').replace('$', ''))
+        paid_by = request.user
+        invoice = request.POST.get('invoice')
+
+        # For now generate booking on payment confirmation
+        booking = Booking(
+            paid_amount=paid_amount,
+            paid_by=paid_by,
+            invoice=invoice,
+        )
+
+        booking.save()
+        print(booking.id)
+
+        tickets = getAvailableTickets(Ticket.objects.all())[:number_of_tickets]
+
+        print(f'Booking these tickets: {tickets}')
+
+        for ticket in tickets:
+            tempBookedTicket = BookedTicket(
+                ticket=ticket,
+                booking=booking,
+            )
+            tempBookedTicket.save()
+
+        return render(request, 'booking/payment_confirmation.html')
+        '''
+    else:
+        return redirect('/booking/')
 
 
 class ShowDetails(View):
     template = 'booking/show_details.html'
+
     def get(self, request, pk, *args, **kwargs):
         try:
-
             show = Show.objects.get(pk=pk)
             seatChart = show.theater.seating_chart['seatLayout']['colAreas']['objArea']
             
@@ -191,24 +205,24 @@ class ShowDetails(View):
             for showing in showing_list:
                 tempSoldTickets = []
                 for ticket in Ticket.objects.filter(showing=showing).filter(available=False):
-                    tempSoldTickets.append({
-                        'AreaDesc': ticket.AreaDesc,
-                        'PhyRowId': ticket.PhyRowId,
-                        'SeatNumber': ticket.SeatNumber
-                    })
+                    # For example: Standard C4
+                    tempSoldTickets.append(
+                        f'{ticket.AreaDesc} {ticket.PhyRowId}{ticket.SeatNumber}'
+                    )
+
+                print('Sold tickets')
+                print(tempSoldTickets)
 
                 dateDict.update({
                     str(dictLength): {
                         'date': showing.datetime.strftime('%c'),
-                        'soldSeats': [ tempSoldTickets ]
+                        'soldSeats': tempSoldTickets
                     }
                 })
                 
                 dictLength += 1
             dateDict.update({ 'length': dictLength })
             
-            print(dateDict)
-
             theater = show.theater
         except Show.DoesNotExist:
             raise Http404("Show does not exist")

@@ -4,27 +4,38 @@
 
 {% load static %}
 
-<div id="cart"></div>
-</div>
-<script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="{{ stripePubKey }}"
-  data-amount="{{ total_cost }}" data-name="Theatre CHS" data-description="Finish purchasing tickets"
-  data-image="{% static 'img/logo.png' %}" data-locale="auto" data-currency="usd" data-allow-remember-me="false">
-  </script>
 
+<div id="button_holder">
+  <form id="stripe_form" action="{% url 'payment_confirmation' %}" method="POST">
+    {% csrf_token %}
+    <div id="cart"></div>
+
+    <input type="hidden" name="showing_id" value="{{ showing_id }}"/>
+    
+    <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="{{ stripePubKey }}"
+      data-amount="{{ total_cost }}" data-name="Theatre CHS" data-description="Finish purchasing tickets"
+      data-image="{% static 'img/logo.png' %}" data-locale="auto" data-currency="usd" data-allow-remember-me="false">
+      </script>
+  </form>
+</div>
+
+<script>
+  
+  /*const mutationObserver = new MutationObserver(function () {
+    console.log('CHANGE DETECTED')
+  })
+  mutationObserver.observe(document.querySelector('#button_holder'), {
+    subtree: true,
+    attributeOldValue: false
+  })*/
+</script>
 
 <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
 <script src="{% static 'js/Cart.js' %}"></script>
 
 <script>
-
-console.log('test')
-window.props = {{ props|safe }}
-console.log(window.props)
-
-</script>
-
-<script>
+  window.props = {{ props | safe }}
   const checkoutDomContainer = document.querySelector('#cart')
   ReactDOM.render(React.createElement(Cart, window.props), checkoutDomContainer)
 </script>

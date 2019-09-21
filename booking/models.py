@@ -460,6 +460,7 @@ class Showing(models.Model):
                                 AreaDesc=section['AreaDesc'],
                                 PhyRowId=row['PhyRowId'],
                                 SeatNumber=seat['SeatNumber'],
+                                seatId=row['PhyRowId']+str(seat['SeatNumber'])
                             )
                         )
 
@@ -482,17 +483,17 @@ class Showing(models.Model):
 
 class Booking(models.Model):
     payment_choice = (
-        ('PAYPAL', 'PayPal'),
+        ('STRIPE'),
+        ('CASH')
     )
+    
+    receipt = models.CharField(max_length=120, null=True, blank=True)
+    payment_method = models.CharField(max_length=7, null=True, blank=True)
+    stripe_id = models.CharField(max_length=27, null=True, blank=True)
 
-    invoice = models.UUIDField(null=True, blank=True)
     datetime = models.DateTimeField(default=now, editable=False)
-    payment_type = models.CharField(
-        max_length=11, choices=payment_choice, default='PayPal')
-    paid_amount = MoneyField(
-        max_digits=14, decimal_places=2, default_currency='USD', null=True, blank=True)
-    paid_by = models.ForeignKey(
-        get_user_model(), on_delete=models.DO_NOTHING, null=True, blank=True)
+    paid_amount = MoneyField(decimal_places=2, max_digits=10, default_currency='USD', null=True, blank=True)
+    paid_by = models.ForeignKey(get_user_model(), on_delete=models.DO_NOTHING, null=True, blank=True)
 
     def __str__(self):
         return f'{self.datetime} | {self.paid_by}'
@@ -502,13 +503,14 @@ class Ticket(models.Model):
     AreaDesc = models.CharField(default='standard', max_length=20)
     PhyRowId = models.CharField(default='A', max_length=20)
     SeatNumber = models.IntegerField(default=1)
+    seatId = models.CharField(default='A1', max_length=20)
 
     available = models.BooleanField(default=True)
 
     showing = models.ForeignKey(Showing, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.AreaDesc}-{self.PhyRowId}-{self.SeatNumber}-{self.showing}'
+        return f'{self.seatId}-{self.showing}' + ('' if self.available else '-SOLD')
 
 
 class BookedTicket(models.Model):
