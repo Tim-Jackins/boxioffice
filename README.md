@@ -9,5 +9,3 @@
 ## Authors
 
 [Jack Timmins](https://github.com/Tim-Jackins)
-
-Adapted from a project by [MradulDubey](https://github.com/mraduldubey).
