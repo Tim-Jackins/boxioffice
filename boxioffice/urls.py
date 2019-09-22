@@ -33,7 +33,6 @@ urlpatterns = [
     url(r'^booking/payment_confirmation/booking/seatconflict.html$', TemplateView.as_view(template_name="booking/seatconflict.html"), name='seatconflict'),
     url(r'^booking/payment_confirmation/booking/payment_cancelled.html$', TemplateView.as_view(template_name="booking/payment_cancelled.html"), name='payment_cancelled'),
 
-    url(r'^blog/', include('blog.urls')),
     url(r'^markdownx/', include('markdownx.urls')),
     
     path('users/', include('users.urls')),

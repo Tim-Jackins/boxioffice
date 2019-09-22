@@ -77,7 +77,6 @@ INSTALLED_APPS = [
     'django.forms',
     'crispy_forms',
     'djmoney',
-    'blog',
     'booking',
     'contact',
     'players',
