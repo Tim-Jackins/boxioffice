@@ -5,17 +5,17 @@ class Cart extends React.Component {
       propCartInfo: null,
       cartHTML:
         <div>
-          <h4 class="d-flex justify-content-between align-items-center mb-3" >
-            <span class="text-muted">Your cart</span>
-            <span class="badge badge-secondary badge-pill">0</span>
+          <h4 className="d-flex justify-content-between align-items-center mb-3" >
+            <span className="text-muted">Your cart</span>
+            <span className="badge badge-secondary badge-pill">0</span>
           </h4>
-          <ul class="list-group mb-3">
-            <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <ul className="list-group mb-3">
+            <li className="list-group-item d-flex justify-content-between lh-condensed">
               <div>
-                <h6 class="my-0">Nothing selected</h6>
+                <h6 className="my-0">Nothing selected</h6>
               </div>
             </li>
-            <li class="list-group-item d-flex justify-content-between">
+            <li className="list-group-item d-flex justify-content-between">
               <span>Total (USD)</span>
               <strong>$0.00</strong>
             </li>
@@ -62,6 +62,7 @@ class Cart extends React.Component {
     } else {
       tempCartInfo = JSON.parse(propsCartInfo)
     }
+    console.log(tempCartInfo)
 
     if (tempCartInfo) {
       const cartInfo = tempCartInfo;
@@ -86,9 +87,9 @@ class Cart extends React.Component {
 
       if (items.length == 0) {
         items[0] =
-          <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <li className="list-group-item d-flex justify-content-between lh-condensed">
             <div>
-              <h6 class="my-0">Nothing selected</h6>
+              <h6 className="my-0">Nothing selected</h6>
             </div>
           </li>
       }

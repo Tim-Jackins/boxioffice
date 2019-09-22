@@ -4,6 +4,7 @@
 
 {% load static %}
 
+<script src="{% static 'js/Cart.jsx' %}" type="text/babel"></script>
 
 <div id="button_holder">
   <form id="stripe_form" action="{% url 'payment_confirmation' %}" method="POST">
@@ -17,10 +18,15 @@
       data-image="{% static 'img/logo.png' %}" data-locale="auto" data-currency="usd" data-allow-remember-me="false">
       </script>
   </form>
+
+  <script type="text/babel">
+    window.props = {{ props | safe }}
+    const checkoutDomContainer = document.querySelector('#cart')
+    ReactDOM.render(React.createElement(Cart, window.props), checkoutDomContainer)
+  </script>
 </div>
 
 <script>
-  
   /*const mutationObserver = new MutationObserver(function () {
     console.log('CHANGE DETECTED')
   })
@@ -28,16 +34,6 @@
     subtree: true,
     attributeOldValue: false
   })*/
-</script>
-
-<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-<script src="{% static 'js/Cart.js' %}"></script>
-
-<script>
-  window.props = {{ props | safe }}
-  const checkoutDomContainer = document.querySelector('#cart')
-  ReactDOM.render(React.createElement(Cart, window.props), checkoutDomContainer)
 </script>
 
 

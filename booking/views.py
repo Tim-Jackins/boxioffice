@@ -74,9 +74,6 @@ def payment_gateway(request):
         print(total_cost)
         print()
         
-        #print(q1[0].datetime)
-
-        #'2019-05-20 16:14:18+00:00'
         
         showing = q1.get(datetime=datetime.datetime.strptime(date, '%c').strftime('%Y-%m-%d %H:%M:%S+00:00'))
 
