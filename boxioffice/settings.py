@@ -52,9 +52,10 @@ LOGOUT_REDIRECT_URL = 'home'
 
 # Mailgun cred
 EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
-MAILGUN_ACCESS_KEY = '56284009ca389b4f813d42e544aef62f-985b58f4-0231c0e2'
-MAILGUN_SERVER_NAME = 'https://api.mailgun.net/v3/mg.jacktimmins.com'
-EMAIL_HOST = 'postmaster@mg.jacktimmins.com'
+MAILGUN_ACCESS_KEY = config('MAILGUN_API_KEY', cast=str)
+MAILGUN_SERVER_NAME = config('MAILGUN_BASE_URL', cast=str)
+EMAIL_HOST = config('MAILGUN_SMTP_LOGIN', cast=str)
+MAILGUN_PASSWORD = config('MAILGUN_SMTP_PASSWORD', cast=str)
 
 #Paypal cred
 PAYPAL_TEST = True
