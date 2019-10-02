@@ -82,7 +82,6 @@ INSTALLED_APPS = [
     'booking',
     'contact',
     'players',
-    'paypal.standard.ipn',
     'social_django',
     'markdownx',
     'users.apps.UsersConfig',
