@@ -14,8 +14,6 @@ from django.http import Http404, JsonResponse
 
 import stripe
 
-from paypal.standard.forms import PayPalPaymentsForm
-
 from boxioffice.settings import EMAIL_HOST, STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY
 import datetime
 import uuid

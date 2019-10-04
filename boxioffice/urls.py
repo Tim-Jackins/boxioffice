@@ -41,11 +41,6 @@ urlpatterns += [
     url(r'^oauth/', include('social_django.urls', namespace='social')),
 ]
 
-# For PayPal IPN
-urlpatterns += [
-    url(r'^paypal/', include('paypal.standard.ipn.urls')),
-]
-
 # For django_markdown
 urlpatterns += [
     url(r'^markdownx/', include('markdownx.urls')),
