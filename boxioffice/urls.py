@@ -9,7 +9,6 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic.base import RedirectView
 
 from contact import views as cont_views
-from booking import views as booking_views
 from players import views as player_views
 from django.contrib.auth import views as auth_views
 
@@ -20,21 +19,9 @@ urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),
     url(r'^contact/$', cont_views.contact,name='contact'),
     url(r'^players/(?P<pk>\d+)/$', player_views.ActorDetailView.as_view(), name='actor_detail'),
-    url(r'^booking/$', booking_views.show_index,name='booking'),
-    url(r'^booking/(?P<pk>\d+)/$', booking_views.ShowDetails.as_view(), name='show_details'),
-    
-    url(r'^booking/seatchoice/(?P<pk>\d+)/$', booking_views.reserve_seat, name='reserve_seat'),
-    url(r'^booking/payment/$', booking_views.payment_gateway, name='payment_gateway'),
-    
-    url(r'^booking/confirmation/$', booking_views.payment_confirmation, name='payment_confirmation'),
-    url(r'^booking/theater/seats/(?P<pk>\d+)/$', booking_views.TheaterSeatsJSON, name='theater_seats'),
-    #Hard Coded templates i.e. without views.
-    url(r'^booking/payment/booking/seatnotfound.html$', TemplateView.as_view(template_name="booking/seatnotfound.html"), name='seatnotfound'),
-    url(r'^booking/payment_confirmation/booking/seatconflict.html$', TemplateView.as_view(template_name="booking/seatconflict.html"), name='seatconflict'),
-    url(r'^booking/payment_confirmation/booking/payment_cancelled.html$', TemplateView.as_view(template_name="booking/payment_cancelled.html"), name='payment_cancelled'),
-
     url(r'^markdownx/', include('markdownx.urls')),
-    
+
+    path('booking/', include('booking.urls')),
     path('users/', include('users.urls')),
     path('users/', include('django.contrib.auth.urls')),
 

@@ -148,39 +148,6 @@ def payment_confirmation(request):
         print(request.POST)
         
         return redirect('/booking/')#render(request, 'booking/checkout.html', context)
-
-        '''
-        showing_id = request.POST.get('showing_id')
-        showing = Showing.objects.get(pk=showing_id)
-        number_of_tickets = eval(request.POST.get('number_of_tickets'))
-
-        paid_amount = eval(request.POST.get('amount').replace('$', ''))
-        paid_by = request.user
-        invoice = request.POST.get('invoice')
-
-        # For now generate booking on payment confirmation
-        booking = Booking(
-            paid_amount=paid_amount,
-            paid_by=paid_by,
-            invoice=invoice,
-        )
-
-        booking.save()
-        print(booking.id)
-
-        tickets = getAvailableTickets(Ticket.objects.all())[:number_of_tickets]
-
-        print(f'Booking these tickets: {tickets}')
-
-        for ticket in tickets:
-            tempBookedTicket = BookedTicket(
-                ticket=ticket,
-                booking=booking,
-            )
-            tempBookedTicket.save()
-
-        return render(request, 'booking/payment_confirmation.html')
-        '''
     else:
         return redirect('/booking/')
 

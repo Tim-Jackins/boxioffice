@@ -403,11 +403,11 @@ class Show(models.Model):
     lang_choice = (
         ('ENGLISH', 'English'),
     )
-    
+
     name = models.CharField(max_length=20)
     director = models.CharField(max_length=20, blank=True)
     theater = models.ForeignKey(
-        'Theater', on_delete=models.CASCADE, null=True, blank=True) 
+        'Theater', on_delete=models.CASCADE, null=True, blank=True)
     language = models.CharField(max_length=10, choices=lang_choice)
     run_length = models.IntegerField(
         help_text="Enter run length in minute's", null=True, blank=True)
@@ -430,7 +430,7 @@ class Theater(models.Model):
     seating_chart = jsonfield.JSONField(
         default='',
         help_text='Enter the JSON seating chart')
-    max_occupancy =  models.IntegerField(
+    max_occupancy = models.IntegerField(
         default=60,
         help_text='Enter the total number of seats.')
 
@@ -450,7 +450,7 @@ class Showing(models.Model):
             showingTickets = []
 
             seatChart = self.show.theater.seating_chart['seatLayout']['colAreas']['objArea']
-            
+
             for section in seatChart:
                 for row in section['objRow']:
                     for seat in row['objSeat']:
@@ -466,9 +466,9 @@ class Showing(models.Model):
 
             print(
                 f'Generating tickets for showing {self.show} at {self.datetime}')
-            
+
             Ticket.objects.bulk_create(showingTickets)
-            
+
         except:
             print('Ticket\'s have already been generated')
 
@@ -486,14 +486,16 @@ class Booking(models.Model):
         ('STRIPE'),
         ('CASH')
     )
-    
+
     receipt = models.CharField(max_length=120, null=True, blank=True)
     payment_method = models.CharField(max_length=7, null=True, blank=True)
     stripe_id = models.CharField(max_length=27, null=True, blank=True)
 
     datetime = models.DateTimeField(default=now, editable=False)
-    paid_amount = MoneyField(decimal_places=2, max_digits=10, default_currency='USD', null=True, blank=True)
-    paid_by = models.ForeignKey(get_user_model(), on_delete=models.DO_NOTHING, null=True, blank=True)
+    paid_amount = MoneyField(
+        decimal_places=2, max_digits=10, default_currency='USD', null=True, blank=True)
+    paid_by = models.ForeignKey(
+        get_user_model(), on_delete=models.DO_NOTHING, null=True, blank=True)
 
     def __str__(self):
         return f'{self.datetime} | {self.paid_by}'
@@ -517,6 +519,10 @@ class BookedTicket(models.Model):
     ticket = models.OneToOneField(Ticket, on_delete=models.CASCADE)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
+
+    def delete(self, *args, **kwargs):
+        self.ticket.available = True
+        super(BookedTicket, self).delete(*args, **kwargs)
 
     def __str__(self):
         return str(self.ticket) + ' | ' + str(self.booking)
