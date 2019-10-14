@@ -9,7 +9,6 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic.base import RedirectView
 
 from contact import views as cont_views
-from players import views as player_views
 from django.contrib.auth import views as auth_views
 
 from django.conf.urls.static import static
@@ -18,10 +17,11 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),
     url(r'^contact/$', cont_views.contact,name='contact'),
-    url(r'^players/(?P<pk>\d+)/$', player_views.ActorDetailView.as_view(), name='actor_detail'),
+    
     url(r'^markdownx/', include('markdownx.urls')),
 
     path('booking/', include('booking.urls')),
+    path('players/', include('players.urls')),
     path('users/', include('users.urls')),
     path('users/', include('django.contrib.auth.urls')),
 
