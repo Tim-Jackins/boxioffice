@@ -514,14 +514,15 @@ class Ticket(models.Model):
     def __str__(self):
         return f'{self.seatId}-{self.showing}' + ('' if self.available else '-SOLD')
 
-
 class BookedTicket(models.Model):
     ticket = models.OneToOneField(Ticket, on_delete=models.CASCADE)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
 
-    def delete(self, *args, **kwargs):
-        self.ticket.available = True
+    def safe_delete(self, *args, **kwargs):
+        connected_ticket = self.ticket#Ticket.objects.get(pk=self.ticket.primary_key)
+        connected_ticket.available = True
+        connected_ticket.save()
         super(BookedTicket, self).delete(*args, **kwargs)
 
     def __str__(self):
