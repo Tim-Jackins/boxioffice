@@ -12,6 +12,8 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 import jsonfield
 import pprint
+from markdownx.models import MarkdownxField
+from markdownx.utils import markdownify
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -409,6 +411,7 @@ class Show(models.Model):
     theater = models.ForeignKey(
         'Theater', on_delete=models.CASCADE, null=True, blank=True)
     language = models.CharField(max_length=10, choices=lang_choice)
+    description = MarkdownxField(default='This is an empty description.')
     run_length = models.IntegerField(
         help_text="Enter run length in minute's", null=True, blank=True)
     image = models.ImageField(null=True, blank=True, upload_to='media')
