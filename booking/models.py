@@ -12,6 +12,8 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 import jsonfield
 import pprint
+from markdownx.models import MarkdownxField
+from markdownx.utils import markdownify
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -409,6 +411,7 @@ class Show(models.Model):
     theater = models.ForeignKey(
         'Theater', on_delete=models.CASCADE, null=True, blank=True)
     language = models.CharField(max_length=10, choices=lang_choice)
+    description = MarkdownxField(default='This is an empty description.')
     run_length = models.IntegerField(
         help_text="Enter run length in minute's", null=True, blank=True)
     image = models.ImageField(null=True, blank=True, upload_to='media')
@@ -514,14 +517,15 @@ class Ticket(models.Model):
     def __str__(self):
         return f'{self.seatId}-{self.showing}' + ('' if self.available else '-SOLD')
 
-
 class BookedTicket(models.Model):
     ticket = models.OneToOneField(Ticket, on_delete=models.CASCADE)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
 
-    def delete(self, *args, **kwargs):
-        self.ticket.available = True
+    def safe_delete(self, *args, **kwargs):
+        connected_ticket = self.ticket#Ticket.objects.get(pk=self.ticket.primary_key)
+        connected_ticket.available = True
+        connected_ticket.save()
         super(BookedTicket, self).delete(*args, **kwargs)
 
     def __str__(self):

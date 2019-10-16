@@ -4,6 +4,25 @@ from django.contrib import admin
 from .models import Show, Theater, Showing, Booking, Ticket, BookedTicket
 
 
+def makeTickets(modeladmin, request, queryset):
+	for showing in queryset:
+		showing.generateTickets()
+makeTickets.short_description = 'Generate Tickets'
+
+
+def makeTicketsAvailable(modeladmin, request, queryset):
+	for ticket in queryset:
+		ticket.available = True
+		ticket.save()
+makeTicketsAvailable.short_description = 'Make Tickets Available'
+
+
+def safeDeleteBooking(modeladmin, request, queryset):
+	for bookedTicket in queryset:
+		bookedTicket.safe_delete()
+makeTicketsAvailable.short_description = 'Safe Delete Booking'
+
+
 class ShowAdmin(admin.ModelAdmin):
 	class Meta:
 		model = Show
@@ -29,13 +48,9 @@ class TicketAdmin(admin.ModelAdmin):
 	class Meta:
 		model = Ticket
 
+	actions = [makeTicketsAvailable, ]
+
 admin.site.register(Ticket,TicketAdmin)
-
-
-def makeTickets(modeladmin, request, queryset):
-	for showing in queryset:
-		showing.generateTickets()
-makeTickets.short_description = 'Generate Tickets'
 
 
 class ShowingAdmin(admin.ModelAdmin):
@@ -47,8 +62,11 @@ class ShowingAdmin(admin.ModelAdmin):
 admin.site.register(Showing,ShowingAdmin)
 
 
+
 class BookedTicketAdmin(admin.ModelAdmin):
 	class Meta:
 		model = BookedTicket
+
+	actions = [safeDeleteBooking, ]
 
 admin.site.register(BookedTicket,BookedTicketAdmin)

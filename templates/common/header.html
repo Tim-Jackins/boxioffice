@@ -16,7 +16,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="index.html">
+              <a class="navbar-brand" href="{% url 'home' %}">
                 <img src="{% static 'img/logo.png' %}" alt="Logo">
               </a>
             </div>
@@ -26,8 +26,10 @@
                 <li><a href="{% url 'home' %}">Home</a></li>
                 <li><a href="{% url 'booking' %}">Booking</a></li>
                 
+                
                 {% if not request.user.is_authenticated %}
                 <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'signup' %}">Sign up</a></li>
                 {% else %}
                 
                 {% if request.user.is_superuser %}

@@ -234,11 +234,11 @@ class SeatSelector extends React.Component {
             </div>
             <div className="col-md-4 order-md-3">
               <Cart />
+              <button className="btn btn-success">Make booking</button>
             </div>
           </div>
           <input type='hidden' name='showId' value={showId} />
           <input type='hidden' name='Date' value={userPicksDate} />
-          <button className="btn btn-success">Make booking</button>
         </div>
       )
     }
