@@ -52,7 +52,7 @@ LOGOUT_REDIRECT_URL = 'home'
 
 # Mailgun cred
 EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
-MAILGUN_ACCESS_KEY = config('MAILGUN_API_KEY', cast=str)
+MAILGUN_ACCESS_KEY = config('MAILGUN_PRIVATE_API_KEY', cast=str)
 MAILGUN_SERVER_NAME = config('MAILGUN_BASE_URL', cast=str)
 EMAIL_HOST = config('MAILGUN_SMTP_LOGIN', cast=str)
 MAILGUN_PASSWORD = config('MAILGUN_SMTP_PASSWORD', cast=str)
