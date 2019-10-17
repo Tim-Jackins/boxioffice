@@ -1,1 +1,1 @@
-web: gunicorn boxioffice.wsgi
+web: gunicorn boxioffice.wsgi --log-file -

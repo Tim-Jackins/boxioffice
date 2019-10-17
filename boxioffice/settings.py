@@ -22,7 +22,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ISLOCAL = config('DEBUG', cast=bool)
+ISLOCAL = config('ISLOCAL', cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
@@ -34,7 +34,7 @@ SITE_ID=1
 # https://www.digitalocean.com/community/tutorials/how-to-set-up-object-storage-with-django
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR),"static","staticfiles")
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR),'media')
@@ -42,6 +42,8 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR),'media')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # Custom login vals
@@ -85,7 +87,7 @@ INSTALLED_APPS = [
     'markdownx',
     'users.apps.UsersConfig',
     'qr_code',
-
+    'herokuapp',
     'rest_framework',
     'webpack_loader',
 ]
@@ -100,6 +102,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Simplified static file serving.
+    # https://warehouse.python.org/project/whitenoise/
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
@@ -195,5 +200,5 @@ STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY')
 
 # Activate Django-Heroku.
-#if not ISLOCAL:
-    #django_heroku.settings(locals())
+if not ISLOCAL:
+    django_heroku.settings(locals())
