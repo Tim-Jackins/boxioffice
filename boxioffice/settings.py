@@ -43,7 +43,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 
 # Custom login vals
@@ -87,14 +87,19 @@ INSTALLED_APPS = [
     'markdownx',
     'users.apps.UsersConfig',
     'qr_code',
-    'herokuapp',
     'rest_framework',
     'webpack_loader',
 ]
 
+#if not ISLOCAL:
+#    INSTALLED_APPS.append('herokuapp')
+
 AUTH_USER_MODEL = 'users.CustomUser'
 
 MIDDLEWARE = [
+    # Simplified static file serving.
+    # https://warehouse.python.org/project/whitenoise/
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -102,9 +107,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # Simplified static file serving.
-    # https://warehouse.python.org/project/whitenoise/
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
@@ -148,12 +150,18 @@ WSGI_APPLICATION = 'boxioffice.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 #DATABASES = herokuify.get_db_config()
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if ISLOCAL:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
+else:
+    prod_db  =  dj_database_url.config(conn_max_age=500)
+    DATABASES = {
+        'default': prod_db
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
