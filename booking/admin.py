@@ -17,10 +17,18 @@ def makeTicketsAvailable(modeladmin, request, queryset):
 makeTicketsAvailable.short_description = 'Make Tickets Available'
 
 
-def safeDeleteBooking(modeladmin, request, queryset):
+def safeDeleteBookedTicket(modeladmin, request, queryset):
 	for bookedTicket in queryset:
 		bookedTicket.safe_delete()
-makeTicketsAvailable.short_description = 'Safe Delete Booking'
+safeDeleteBookedTicket.short_description = 'Safe Delete Booked Ticket'
+
+
+def safeDeleteBooking(modeladmin, request, queryset):
+	for booking in queryset:
+		for tempBookedTicket in BookedTicket.objects.filter(booking=booking):
+			tempBookedTicket.safe_delete()
+		booking.delete()
+safeDeleteBooking.short_description = 'Safe Delete Booking'
 
 
 class ShowAdmin(admin.ModelAdmin):
@@ -40,6 +48,8 @@ admin.site.register(Theater,TheaterAdmin)
 class BookingAdmin(admin.ModelAdmin):
 	class Meta:
 		model = Booking
+	
+	actions = [safeDeleteBooking, ]
 
 admin.site.register(Booking,BookingAdmin)
 
@@ -67,6 +77,6 @@ class BookedTicketAdmin(admin.ModelAdmin):
 	class Meta:
 		model = BookedTicket
 
-	actions = [safeDeleteBooking, ]
+	actions = [safeDeleteBookedTicket, ]
 
 admin.site.register(BookedTicket,BookedTicketAdmin)
