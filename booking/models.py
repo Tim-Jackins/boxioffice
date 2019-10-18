@@ -507,7 +507,7 @@ class Booking(models.Model):
 class Ticket(models.Model):
     AreaDesc = models.CharField(default='standard', max_length=50)
     PhyRowId = models.CharField(default='X', max_length=50)
-    SeatNumber = models.IntegerField(default=1, max_length=50)
+    SeatNumber = models.IntegerField(default=1)
     seatId = models.CharField(default='X1', max_length=50)
 
     available = models.BooleanField(default=True)
