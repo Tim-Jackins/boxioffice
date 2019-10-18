@@ -35,6 +35,8 @@ You should be able to simply run the `automigrate.py` program.
 
 [Cookbook](https://github.com/nigma/heroku-django-cookbook/blob/master/README.md)
 
+[Heroku config with ease](https://github.com/sdkcodes/heroku-config)
+
 ## Authors
 
 [Jack Timmins](https://github.com/Tim-Jackins)
