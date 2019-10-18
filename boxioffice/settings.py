@@ -22,12 +22,12 @@ if os.path.isfile(dotenv_file):
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', cast=bool)
+DEBUG = config('DEBUG')
 
-ISLOCAL = config('ISLOCAL', cast=bool)
+ISLOCAL = os.getenv('ISLOCAL')
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
@@ -58,10 +58,10 @@ LOGOUT_REDIRECT_URL = 'home'
 
 # Mailgun cred
 EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
-MAILGUN_ACCESS_KEY = config('MAILGUN_PRIVATE_API_KEY', cast=str)
-MAILGUN_SERVER_NAME = config('MAILGUN_BASE_URL', cast=str)
-EMAIL_HOST = config('MAILGUN_SMTP_LOGIN', cast=str)
-MAILGUN_PASSWORD = config('MAILGUN_SMTP_PASSWORD', cast=str)
+MAILGUN_ACCESS_KEY = os.getenv('MAILGUN_PRIVATE_API_KEY')
+MAILGUN_SERVER_NAME = os.getenv('MAILGUN_BASE_URL')
+EMAIL_HOST = os.getenv('MAILGUN_SMTP_LOGIN')
+MAILGUN_PASSWORD = os.getenv('MAILGUN_SMTP_PASSWORD')
 
 #Paypal cred
 PAYPAL_TEST = True
@@ -155,7 +155,13 @@ WSGI_APPLICATION = 'boxioffice.wsgi.application'
 
 #DATABASES = herokuify.get_db_config()
 DATABASES = {}
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+if ISLOCAL:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+else:
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -194,16 +200,16 @@ USE_TZ = True
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 # Social Django
-SOCIAL_AUTH_GITHUB_KEY = config('SOCIAL_AUTH_GITHUB_KEY')
-SOCIAL_AUTH_GITHUB_SECRET = config('SOCIAL_AUTH_GITHUB_SECRET')
+SOCIAL_AUTH_GITHUB_KEY = os.getenv('SOCIAL_AUTH_GITHUB_KEY')
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
 
 #Stripe
-STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY')
-STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 
 # Activate Django-Heroku.
 if not ISLOCAL:
     django_heroku.settings(locals())
 
-if ISLOCAL:
-    del DATABASES['default']['OPTIONS']['sslmode']
+#if ISLOCAL:
+#    del DATABASES['default']['OPTIONS']['sslmode']
