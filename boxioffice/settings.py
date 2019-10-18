@@ -1,7 +1,13 @@
 import django_heroku
 import os
+import dotenv
 from decouple import config
 import dj_database_url
+
+
+dotenv_file = os.path.join(BASE_DIR, ".env")
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
 
 
 # Misc
@@ -17,17 +23,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+#SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', cast=bool)
+#DEBUG = config('DEBUG', cast=bool)
 
-ISLOCAL = config('ISLOCAL', cast=bool)
+#ISLOCAL = config('ISLOCAL', cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
 SITE_ID=1
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -150,18 +155,8 @@ WSGI_APPLICATION = 'boxioffice.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 #DATABASES = herokuify.get_db_config()
-if ISLOCAL:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
-else:
-    prod_db  =  dj_database_url.config(conn_max_age=500)
-    DATABASES = {
-        'default': prod_db
-    }
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -210,3 +205,6 @@ STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY')
 # Activate Django-Heroku.
 if not ISLOCAL:
     django_heroku.settings(locals())
+
+if IS_LOCAL:
+    del DATABASES['default']['OPTIONS']['sslmode']
