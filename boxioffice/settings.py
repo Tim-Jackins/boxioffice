@@ -25,9 +25,9 @@ if os.path.isfile(dotenv_file):
 #SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', cast=bool)
+#DEBUG = config('DEBUG', cast=bool)
 
-ISLOCAL = config('ISLOCAL', cast=bool)
+#ISLOCAL = config('ISLOCAL', cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
@@ -205,5 +205,5 @@ STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY')
 if not ISLOCAL:
     django_heroku.settings(locals())
 
-if IS_LOCAL:
+if ISLOCAL:
     del DATABASES['default']['OPTIONS']['sslmode']
