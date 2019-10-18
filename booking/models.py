@@ -414,7 +414,7 @@ class Show(models.Model):
     description = MarkdownxField(default='This is an empty description.')
     run_length = models.IntegerField(
         help_text="Enter run length in minute's", null=True, blank=True)
-    image = models.ImageField(null=True, blank=True, upload_to='media')
+    image = models.ImageField(null=True, blank=True, upload_to='media', max_length=255)
 
     @property
     def length(self):
@@ -505,10 +505,10 @@ class Booking(models.Model):
 
 
 class Ticket(models.Model):
-    AreaDesc = models.CharField(default='standard', max_length=20)
-    PhyRowId = models.CharField(default='A', max_length=20)
-    SeatNumber = models.IntegerField(default=1)
-    seatId = models.CharField(default='A1', max_length=20)
+    AreaDesc = models.CharField(default='standard', max_length=50)
+    PhyRowId = models.CharField(default='X', max_length=50)
+    SeatNumber = models.IntegerField(default=1, max_length=50)
+    seatId = models.CharField(default='X1', max_length=50)
 
     available = models.BooleanField(default=True)
 
